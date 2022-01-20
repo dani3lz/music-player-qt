@@ -36,7 +36,7 @@ class Ui_MainWindow(object):
         self.titleBarTitle.setFont(font)
         self.titleBarTitle.setStyleSheet("background: transparent;\n"
                                          "color: #CDCDCD;")
-        self.titleBarTitle.setText("Linux Player")
+        self.titleBarTitle.setText("Player")
         self.titleBarTitle.setObjectName("titleBarTitle")
 
         self.titleBarInfoLabel = QtWidgets.QLabel(self.centralwidget)

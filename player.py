@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
-from PyQt5.QtGui import QPixmap, QIcon, QFont, QColor, QDesktopServices
+from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
 from playerUI import Ui_MainWindow
 import upload
 from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
@@ -10,14 +10,13 @@ import json
 import shutil
 
 
-# from mutagen.id3 import ID3
 def suppress_qt_warnings():
     os.environ["QT_DEVICE_PIXEL_RATIO"] = "0"
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     os.environ["QT_SCREEN_SCALE_FACTORS"] = "1"
     os.environ["QT_SCALE_FACTOR"] = "1"
 
-# MAIN WINDOW ----------------------------------------------------------------------------------------------------------
+
 class PlayerWindow(QMainWindow):
     def __init__(self):
         super(PlayerWindow, self).__init__()
@@ -27,7 +26,7 @@ class PlayerWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setFixedSize(self.width(), self.height())
         self.setWindowTitle(name_window)
-        self.setWindowIcon(QIcon('linux_player.ico'))
+        self.setWindowIcon(QIcon('player.ico'))
 
         # Setup elements Nr.1
         self.first = True
@@ -66,6 +65,7 @@ class PlayerWindow(QMainWindow):
             self.ui.listWidget.setCurrentRow(self.row)
             first_song = True
         except Exception as e:
+            print(e)
             first_song = False
             self.row = 0
 
@@ -125,9 +125,9 @@ class PlayerWindow(QMainWindow):
 
         # Tray menu
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon("linux_player.ico"))
+        self.tray_icon.setIcon(QIcon("player.ico"))
 
-        show_action = QAction(QIcon("linux_player.ico"), "Linux Player", self)
+        show_action = QAction(QIcon("player.ico"), "Player", self)
         github_action = QAction("Github", self)
         about_action = QAction("About", self)
         exit_action = QAction("Exit", self)
@@ -310,7 +310,7 @@ class PlayerWindow(QMainWindow):
 
     def open_github(self):
         try:
-            url = QUrl("https://github.com/dani3lz/Linux_Project")
+            url = QUrl("https://github.com/dani3lz/Music_Player")
             QDesktopServices.openUrl(url)
         except Exception as e:
             print(e)
@@ -362,10 +362,10 @@ class PlayerWindow(QMainWindow):
             self.msg_about = QMessageBox()
             self.msg_about.setWindowTitle("About")
             self.msg_about.setWindowIcon(QIcon("img/about.ico"))
-            self.msg_about.setText("Linux Player<br>"
+            self.msg_about.setText("Player<br>"
                                    "Version: 1.0<br>"
                                    "Developer: Daniel Zavorot (dani3lz)<br>"
-                                   "Github: <a href='https://github.com/dani3lz/Linux_Project'>https://github.com/dani3lz/Linux_Project</a>")
+                                   "Github: <a href='https://github.com/dani3lz/Music_Player'>https://github.com/dani3lz/Music_Player</a>")
             self.msg_about.show()
         except Exception as e:
             print(e)
@@ -812,14 +812,10 @@ class PlayerWindow(QMainWindow):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-
 if __name__ == "__main__":
     suppress_qt_warnings()
     app = QApplication([])
-    name_window = "Linux Player"
+    name_window = "Player"
     window = PlayerWindow()
     window.show()
     upload = upload.UploadWindow()
