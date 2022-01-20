@@ -1,0 +1,5 @@
+songs/
+covers/
+songs.json
+settings.json
+__pycache__/

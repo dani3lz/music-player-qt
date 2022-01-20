@@ -1,0 +1,826 @@
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QColor, QDesktopServices
+from playerUI import Ui_MainWindow
+import upload
+from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
+import os
+import sys
+import json
+import shutil
+
+
+# from mutagen.id3 import ID3
+def suppress_qt_warnings():
+    os.environ["QT_DEVICE_PIXEL_RATIO"] = "0"
+    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    os.environ["QT_SCREEN_SCALE_FACTORS"] = "1"
+    os.environ["QT_SCALE_FACTOR"] = "1"
+
+# MAIN WINDOW ----------------------------------------------------------------------------------------------------------
+class PlayerWindow(QMainWindow):
+    def __init__(self):
+        super(PlayerWindow, self).__init__()
+
+        # Setup main window
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowTitle(name_window)
+        self.setWindowIcon(QIcon('linux_player.ico'))
+
+        # Setup elements Nr.1
+        self.first = True
+        self.login_show = True
+        self.volume = 50
+        self.titles = []
+        self.artists = []
+        self.covers = []
+        self.shuffle = False
+        self.repeatthis = False
+        self.repeatonce = False
+        self.changeMode = False
+        self.mode = "Normal"
+        self.now_sec = 0
+        self.currentIndex = 0
+
+        # Read file with songs and settings
+        self.row = 0
+        self.readSongs()
+        self.settings_read()
+        self.checkCover()
+
+        # Setup elements Nr.2
+        self.isPlaying = False
+        self.ui.musicSlider.setPageStep(0)
+        self.valueSlider = 0
+        self.newIndex = -1
+        self.playlist.setPlaybackMode(3)
+        self.ui.listWidget.setCurrentRow(0)
+
+        # Check if exist first song in file
+        try:
+            self.ui.titleLabel.setText(self.titles[self.row])
+            self.ui.artistLabel.setText(self.artists[self.row])
+            self.player.playlist().setCurrentIndex(self.row)
+            self.ui.listWidget.setCurrentRow(self.row)
+            first_song = True
+        except Exception as e:
+            first_song = False
+            self.row = 0
+
+        # Volume and duration label
+        self.player.setVolume(self.volume)
+        self.ui.durationLabel.setText("0:00 / 0:00")
+        self.lastVolume = self.volume
+
+        # Connect buttons
+        self.ui.playButton.clicked.connect(self.play)
+        self.ui.nextButton.clicked.connect(self.next)
+        self.ui.prevButton.clicked.connect(self.prev)
+        self.ui.shuffleButton.clicked.connect(self.shuffleMode)
+        self.ui.repeatThis.clicked.connect(self.repeatThisMode)
+        self.ui.refreshButton.clicked.connect(self.refreshMode)
+        self.ui.playButton.setIcon(QIcon("play.png"))
+        self.ui.volumeButton.clicked.connect(self.mute)
+        #self.ui.offlineButton.clicked.connect(self.set_offline_mode)
+        self.ui.aboutButton.clicked.connect(self.aboutButton)
+        self.ui.closeButton.clicked.connect(self.closeButton_clicked)
+        self.ui.minimizeButton.clicked.connect(self.minimizeButton_clicked)
+
+        # Music slider bar connect
+        self.ui.musicSlider.sliderReleased.connect(self.sliderValue)
+        self.ui.listWidget.itemClicked.connect(self.changeSong)
+
+        # Volume slider bar connect
+        self.ui.volumeSlider.setValue(self.volume)
+        self.ui.volumeSlider.actionTriggered.connect(self.setVolume)
+
+        # Setup timer
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.time_hit)
+        self.timer.start(int(1000 / 60))
+
+        # Get text from current item
+        try:
+            self.text_item = self.ui.listWidget.currentItem().text()
+        except Exception as e:
+            print(e)
+
+        # Check mode
+        self.checkMode()
+        if os.path.exists('songs'):
+            self.read_songs()
+            self.checkstylebuttons()
+        else:
+            self.checkstylebuttons()
+
+        # Set color if exist first song
+        if first_song:
+            self.text_item = self.ui.listWidget.currentItem().text()
+            self.ui.listWidget.currentItem().setText("❯ " + self.text_item)
+
+        self.start = QPoint(0, 0)
+        self.pressing = False
+
+        # Tray menu
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon("linux_player.ico"))
+
+        show_action = QAction(QIcon("linux_player.ico"), "Linux Player", self)
+        github_action = QAction("Github", self)
+        about_action = QAction("About", self)
+        exit_action = QAction("Exit", self)
+        show_action.triggered.connect(self.open_tray_button)
+        github_action.triggered.connect(self.open_github)
+        about_action.triggered.connect(self.aboutButton)
+        exit_action.triggered.connect(qApp.quit)
+
+        tray_menu = QMenu()
+        tray_menu.setStyleSheet("QMenu{\n"
+                                    "background-color: #181818;\n"
+                                    "color: #EAE9E9;}\n"
+                                    "QMenu::item{\n"
+                                    "}\n"
+                                "\n"
+                                "QMenu::item:selected{\n"
+                                    "background: #252525;}\n"
+                                "\n"
+                                "QMenu::separator{\n"
+                                    "height: 10px;\n"
+                                    "margin-left: 10px;\n"
+                                    "margin-right: 5px;}")
+        tray_menu.addAction(show_action)
+        tray_menu.addSeparator()
+        tray_menu.addAction(github_action)
+        tray_menu.addAction(about_action)
+        tray_menu.addSeparator()
+        tray_menu.addAction(exit_action)
+
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.activated.connect(self.systemIcon)
+        self.tray_icon.show()
+# -----------------------------------------------------------------------------------------------------------------------
+
+        # Read Songs NEW
+    def readSongs(self):
+        if not os.path.exists('songs'):
+            os.makedirs('songs')
+        self.player = QMediaPlayer()
+        self.playlist = QMediaPlaylist(self.player)
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+            self.titles.clear()
+            self.artists.clear()
+            self.covers.clear()
+            for i in data["Songs"]:
+                # title
+                self.titles.append(i["title"])
+                # artist
+                self.artists.append(i["artist"])
+                # cover
+                if i["cover"] == "Undefined":
+                    self.covers.append("no_image.jpg")
+                else:
+                    self.covers.append(i["cover"])
+        except Exception as e:
+            print(e)
+        self.read_songs()
+
+    # Read all downloaded songs
+    def read_songs(self):
+        try:
+            self.ui.listWidget.clear()
+            self.playlist = QMediaPlaylist(self.player)
+
+            count = len(os.listdir("songs"))
+            for nr in range(count):
+                song_name = str(nr) + ".mp3"
+                '''try:
+                    mp3 = ID3(song_name)
+                    mp3.delete()
+                except Exception as e:
+                    print(e)'''
+
+                self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+        except Exception as e:
+            print(e)
+
+        try:
+            self.ui.titleLabel.setText(self.titles[self.row])
+            self.ui.artistLabel.setText(self.artists[self.row])
+            self.player.setPlaylist(self.playlist)
+            self.currentIndex = self.row
+            self.player.playlist().setCurrentIndex(self.currentIndex)
+            self.ui.listWidget.setCurrentRow(self.currentIndex)
+            self.checkCover()
+            self.player.setVolume(self.volume)
+            if self.mode == "Shuffle":
+                self.playlist.setPlaybackMode(4)
+            elif self.mode == "Repeat This":
+                self.playlist.setPlaybackMode(1)
+            elif self.mode == "Repeat Once":
+                self.playlist.setPlaybackMode(0)
+            else:
+                self.mode = "Normal"
+                self.playlist.setPlaybackMode(3)
+        except Exception as e:
+            print(e)
+
+
+    # Refresh button
+    def refreshMode(self):
+        self.timer.stop()
+        with open("songs.json", "r", encoding="utf-8") as file:
+            songs_list = json.load(file)
+        window.setEnabled(False)
+        if not os.path.exists('songs'):
+            os.makedirs('songs')
+        nr_of_files = len(os.listdir("songs"))
+        try:
+            fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
+            if fname:
+                nr = len(fname[0])
+                for i in range(nr):
+                    path = fname[0][i].split("/")
+                    file_name_with_ext = path[-1]
+                    file_name = file_name_with_ext.rsplit(".", 1)[0]
+
+                    try:
+                        info_song = file_name.split("-")
+                        song_name = info_song[0]
+                        artist = info_song[1]
+                    except Exception as e:
+                        print(e)
+                        song_name = ""
+                        artist = ""
+
+
+                    if i == (nr - 1):
+                        upload.start("final", file_name_with_ext, song_name, artist, nr_of_files)
+                    else:
+                        upload.start("next", file_name_with_ext, song_name, artist, nr_of_files)
+                    while upload.isVisible():
+                        QApplication.processEvents()
+                        pass
+                    shutil.copy(fname[0][i], "./songs/" + str(nr_of_files) + ".mp3")
+
+                    if str(upload.ui.textEditName.toPlainText()) == "":
+                        song_name = "Undefined"
+                    else:
+                        song_name = str(upload.ui.textEditName.toPlainText())
+
+                    if str(upload.ui.textEdit_2.toPlainText()) == "":
+                        artist = "Undefined"
+                    else:
+                        artist = str(upload.ui.textEdit_2.toPlainText())
+
+                    upload.ui.textEditName.clear()
+                    upload.ui.textEdit_2.clear()
+                    upload.ui.coverLabelInfo.clear()
+                    upload.ui.selectedFileInfo.clear()
+
+                    songs_list["Songs"].append({
+                        "id": nr_of_files,
+                        "title": song_name,
+                        "artist": artist,
+                        "cover": upload.file_name_final
+                    })
+                    nr_of_files += 1
+        except Exception as e:
+            print(e)
+        songs_list["Songs"].sort(key=lambda x: x["id"])
+        with open("songs.json", "w", encoding="utf-8") as file:
+            json.dump(songs_list, file, indent=4)
+        self.readSongs()
+        self.timer.start()
+        window.setEnabled(True)
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+    # Tray menu
+    def open_tray_button(self):
+        if not self.isVisible():
+            self.show()
+        else:
+            self.activateWindow()
+
+    def open_github(self):
+        try:
+            url = QUrl("https://github.com/dani3lz/Linux_Project")
+            QDesktopServices.openUrl(url)
+        except Exception as e:
+            print(e)
+
+    def systemIcon(self, reason):
+        if reason == QSystemTrayIcon.Trigger:
+            if self.windowState() == Qt.WindowMinimized:
+                self.setWindowState(Qt.WindowNoState)
+            else:
+                if not self.isVisible():
+                    self.show()
+                else:
+                    self.activateWindow()
+
+
+    # Check mouse press event
+    def mousePressEvent(self, event):
+        self.start = self.mapToGlobal(event.pos())
+        self.pressing = True
+
+    # Drag app
+    def mouseMoveEvent(self, event):
+        if self.pressing and (self.ui.titleBarLabel.underMouse() or self.ui.titleBarInfoLabel.underMouse() or self.ui.titleBarTitle.underMouse()):
+            self.end = self.mapToGlobal(event.pos())
+            self.movement = self.end - self.start
+            self.setGeometry(self.mapToGlobal(self.movement).x(),
+                                    self.mapToGlobal(self.movement).y(),
+                                    self.width(),
+                                    self.height())
+            self.start = self.end
+
+    # Minimize App
+    def minimizeButton_clicked(self):
+        self.showMinimized()
+
+    # Close App
+    def closeButton_clicked(self):
+        self.hide()
+
+    # Close event in minimized status
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
+
+    # Function for About button
+    def aboutButton(self):
+        try:
+            self.show()
+            self.msg_about = QMessageBox()
+            self.msg_about.setWindowTitle("About")
+            self.msg_about.setWindowIcon(QIcon("img/about.ico"))
+            self.msg_about.setText("Linux Player<br>"
+                                   "Version: 1.0<br>"
+                                   "Developer: Daniel Zavorot (dani3lz)<br>"
+                                   "Github: <a href='https://github.com/dani3lz/Linux_Project'>https://github.com/dani3lz/Linux_Project</a>")
+            self.msg_about.show()
+        except Exception as e:
+            print(e)
+
+    # Mute - function for volume
+    def mute(self):
+        if self.volume > 0:
+            self.lastVolume = self.volume
+            self.volume = 0
+            self.ui.volumeSlider.setValue(0)
+            self.player.setVolume(0)
+        else:
+            if self.lastVolume > 0:
+                self.volume = self.lastVolume
+                self.ui.volumeSlider.setValue(self.volume)
+                self.player.setVolume(self.volume)
+            else:
+                self.ui.volumeSlider.setValue(75)
+                self.player.setVolume(75)
+
+    # Convert duration of song to minutes and seconds
+    def convertMillis(self, millis):
+        seconds = (millis / 1000) % 60
+        minutes = (millis / (1000 * 60)) % 60
+        return minutes, seconds
+
+    # Volume slider
+    def setVolume(self):
+        self.volume = self.ui.volumeSlider.value()
+        self.player.setVolume(self.volume)
+
+
+    # Change music using the list
+    def changeSong(self):
+        self.row = self.ui.listWidget.currentRow()
+        self.player.playlist().setCurrentIndex(self.row)
+        if not self.isPlaying:
+            self.player.play()
+            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/pause.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+            self.isPlaying = True
+
+    # Music slider
+    def sliderValue(self):
+        self.player.setPosition(self.ui.musicSlider.value())
+
+    # Read information about player
+    def settings_read(self):
+        try:
+            with open("settings.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for i in data["Settings"]:
+                self.volume = i["Volume"]
+                self.lastVolume = self.volume
+                self.row = i["Row"]
+                self.mode = i["Mode"]
+            self.currentIndex = self.row
+        except Exception as e:
+            print(e)
+
+    # Check player mode
+    def checkMode(self):
+        if self.mode == "Shuffle":
+            self.shuffleMode()
+        elif self.mode == "Repeat This":
+            self.repeatThisMode()
+        elif self.mode == "Repeat Once":
+            self.repeatthis = True
+            self.repeatThisMode()
+
+    # Write current information about player
+    def settings_write(self):
+        settings_list = {}
+        settings_list["Settings"] = []
+        settings_list["Settings"].append({
+            "Volume": self.volume,
+            "Row": self.row,
+            "Mode": self.mode
+        })
+        with open("settings.json", "w", encoding="utf-8") as f:
+            json.dump(settings_list, f, indent=4)
+
+    # Timer
+    def time_hit(self):
+        if self.isPlaying:
+            self.ui.musicSlider.setMaximum(self.player.duration())
+            if not self.ui.musicSlider.isSliderDown():
+                self.ui.musicSlider.setValue(self.player.position())
+            self.newIndex = self.player.playlist().currentIndex()
+            self.checkList()
+
+            song_min, song_sec = self.convertMillis(int(self.player.duration()))
+            if song_sec < 10:
+                self.song_duration = "{0}:0{1}".format(int(song_min), int(song_sec))
+            else:
+                self.song_duration = "{0}:{1}".format(int(song_min), int(song_sec))
+
+            now_min, self.now_sec = self.convertMillis(int(self.ui.musicSlider.value()))
+            if self.now_sec < 10:
+                self.now_duration = "{0}:0{1}".format(int(now_min), int(self.now_sec))
+            else:
+                self.now_duration = "{0}:{1}".format(int(now_min), int(self.now_sec))
+
+            self.ui.durationLabel.setText(str(self.now_duration) + " / " + str(self.song_duration))
+
+            if self.repeatonce:
+                if self.now_duration == self.song_duration:
+                    self.isPlaying = False
+                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                     "border-image: url(img/play.png);\n"
+                                                     "background: none;\n"
+                                                     "border: none;\n"
+                                                     "background-repeat: none;")
+                    self.player.stop()
+        self.settings_write()
+
+    # Check cover image
+    def checkCover(self):
+        try:
+            if self.covers[self.currentIndex] == "no_image.jpg":
+                self.imgsrc = QPixmap("img/" + self.covers[self.currentIndex])
+            else:
+                self.imgsrc = QPixmap("covers/" + self.covers[self.currentIndex])
+            self.w = self.ui.imgLabel.width()
+            self.h = self.ui.imgLabel.height()
+            self.ui.imgLabel.setPixmap(self.imgsrc.scaled(self.w, self.h))
+        except Exception as e:
+            print(e)
+
+    # Sets the current position in the list
+    def checkList(self):
+        try:
+            if self.currentIndex == self.newIndex:
+                pass
+            else:
+                self.ui.listWidget.item(self.currentIndex).setText(self.text_item)
+                self.ui.listWidget.item(self.currentIndex).setForeground(QColor("#fff"))
+
+                self.text_item = self.ui.listWidget.item(self.newIndex).text()
+                self.ui.listWidget.item(self.newIndex).setForeground(QColor("#1DB954"))
+                self.ui.listWidget.item(self.newIndex).setText("❯ " + self.text_item)
+
+                self.ui.titleLabel.setText(self.titles[self.newIndex])
+                self.ui.artistLabel.setText(self.artists[self.newIndex])
+                self.ui.listWidget.setCurrentRow(self.player.playlist().currentIndex())
+                self.currentIndex = self.newIndex
+                self.row = self.newIndex
+                self.checkCover()
+        except Exception as e:
+            print(e)
+
+    # Play button
+    def play(self):
+        if not self.isPlaying:
+            self.player.play()
+            self.isPlaying = True
+            self.newIndex = self.player.playlist().currentIndex()
+            self.checkStyle()
+        else:
+            self.player.pause()
+            self.isPlaying = False
+            self.checkStyle()
+
+
+    # Next button
+    def next(self):
+        self.playlist.next()
+        self.newIndex = self.player.playlist().currentIndex()
+        if not self.isPlaying:
+            self.player.play()
+            self.isPlaying = True
+            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/pause.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+
+    # Previous button
+    def prev(self):
+        if int(self.now_sec) < 10:
+            self.playlist.previous()
+            self.newIndex = self.player.playlist().currentIndex()
+        else:
+            self.player.setPosition(0)
+        if not self.isPlaying:
+            self.player.play()
+            self.isPlaying = True
+            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/pause.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+
+    # Repeat This button
+    def repeatThisMode(self):
+        if not self.repeatthis and not self.repeatonce:
+            self.playlist.setPlaybackMode(1)
+            self.repeatthis = True
+            self.shuffle = False
+            self.repeatonce = False
+            self.mode = "Repeat This"
+            self.checkstylebuttons()
+        elif self.repeatthis:
+            self.playlist.setPlaybackMode(0)
+            self.repeatthis = False
+            self.shuffle = False
+            self.repeatonce = True
+            self.mode = "Repeat Once"
+            self.checkstylebuttons()
+        else:
+            self.playlist.setPlaybackMode(3)
+            self.repeatonce = False
+            self.mode = "Normal"
+            self.checkstylebuttons()
+
+    # Shuffle button
+    def shuffleMode(self):
+        if not self.shuffle:
+            self.playlist.setPlaybackMode(4)
+            self.shuffle = True
+            self.repeatonce = False
+            self.repeatthis = False
+            self.mode = "Shuffle"
+            self.checkstylebuttons()
+        else:
+            self.playlist.setPlaybackMode(3)
+            self.shuffle = False
+            self.mode = "Normal"
+            self.checkstylebuttons()
+
+    def checkstylebuttons(self):
+        if self.shuffle:
+            self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/shuffle_on.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+        else:
+            self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
+                                                "border-image: url(img/shuffle.png);\n"
+                                                "background: none;\n"
+                                                "border: none;\n"
+                                                "background-repeat: none;")
+
+        if self.repeatthis and not self.repeatonce:
+            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
+                                                "border-image: url(img/repeatthis_on.png);\n"
+                                                "background: none;\n"
+                                                "border: none;\n"
+                                                "background-repeat: none;")
+        elif not self.repeatthis and self.repeatonce:
+            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/repeatonce.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+        else:
+            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
+                                             "border-image: url(img/repeatthis.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
+
+    def checkStyle(self):
+        if self.isEnabled():
+            if self.ui.aboutButton.underMouse():
+                self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
+                                               "border-image: url(img/about_focus.png);\n"
+                                               "background: none;\n"
+                                               "border: none;\n"
+                                               "background-repeat: none;")
+            else:
+                self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
+                                               "border-image: url(img/about.png);\n"
+                                               "background: none;\n"
+                                               "border: none;\n"
+                                               "background-repeat: none;")
+            if self.ui.musicSlider.underMouse():
+                self.ui.musicSlider.setStyleSheet("QSlider{\n"
+                                                    "    background-color: transparent;\n"
+                                                    "}\n"
+                                                    "QSlider::groove:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: transparent;\n"
+                                                    "    height: 3px;\n"
+                                                    "}\n"
+                                                    "QSlider::sub-page:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                                    "}\n"
+                                                    "QSlider::add-page:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: rgb(118, 118, 118);\n"
+                                                    "}\n"
+                                                    "QSlider::handle:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: rgb(216, 216, 216);\n"
+                                                    "    width: 14px;\n"
+                                                    "    margin: -5px;\n"
+                                                    "    border-radius: 6px;\n"
+                                                    "}\n"
+                                                    "QSlider::handle:horizontal:hover \n"
+                                                    "{\n"
+                                                    "    background-color: rgb(240, 240, 240);\n"
+                                                    "}")
+            else:
+                self.ui.musicSlider.setStyleSheet("QSlider{\n"
+                                                    "    background-color: transparent;\n"
+                                                    "}\n"
+                                                    "QSlider::groove:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: transparent;\n"
+                                                    "    height: 3px;\n"
+                                                    "}\n"
+                                                    "QSlider::sub-page:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                                    "}\n"
+                                                    "QSlider::add-page:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: rgb(118, 118, 118);\n"
+                                                    "}\n"
+                                                    "QSlider::handle:horizontal \n"
+                                                    "{\n"
+                                                    "    background-color: transparent;\n"
+                                                    "    width: 14px;\n"
+                                                    "    margin: -5px;\n"
+                                                    "    border-radius: 6px;\n"
+                                                    "}\n"
+                                                    "QSlider::handle:horizontal:hover \n"
+                                                    "{\n"
+                                                    "    background-color: rgb(240, 240, 240);\n"
+                                                    "}")
+
+            if self.ui.playButton.underMouse():
+                if not self.isPlaying:
+                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                     "border-image: url(img/play_focus.png);\n"
+                                                     "background: none;\n"
+                                                     "border: none;\n"
+                                                     "background-repeat: none;")
+                else:
+                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                     "border-image: url(img/pause_focus.png);\n"
+                                                     "background: none;\n"
+                                                     "border: none;\n"
+                                                     "background-repeat: none;")
+            else:
+                if not self.isPlaying:
+                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                     "border-image: url(img/play.png);\n"
+                                                     "background: none;\n"
+                                                     "border: none;\n"
+                                                     "background-repeat: none;")
+                else:
+                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                     "border-image: url(img/pause.png);\n"
+                                                     "background: none;\n"
+                                                     "border: none;\n"
+                                                     "background-repeat: none;")
+
+            if self.ui.nextButton.underMouse():
+                self.ui.nextButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/next_focus.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
+            else:
+                self.ui.nextButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/next.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
+
+            if self.ui.prevButton.underMouse():
+                self.ui.prevButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/prev_focus.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
+            else:
+                self.ui.prevButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/prev.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
+
+    def checkstyleVolume(self):
+        if self.isEnabled():
+            if self.ui.volumeButton.underMouse():
+                if self.ui.volumeSlider.value() == 0:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/mute_focus.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/low_focus.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/medium_focus.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 70:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/max_focus.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+
+            else:
+                if self.ui.volumeSlider.value() == 0:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                "border-image: url(img/mute.png);\n"
+                                                "background: none;\n"
+                                                "border: none;\n"
+                                                "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/low.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/medium.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+                elif self.ui.volumeSlider.value() > 70:
+                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
+                                                    "border-image: url(img/max.png);\n"
+                                                    "background: none;\n"
+                                                    "border: none;\n"
+                                                    "background-repeat: none;")
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    suppress_qt_warnings()
+    app = QApplication([])
+    name_window = "Linux Player"
+    window = PlayerWindow()
+    window.show()
+    upload = upload.UploadWindow()
+    sys.exit(app.exec())
