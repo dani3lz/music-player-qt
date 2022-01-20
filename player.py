@@ -233,6 +233,7 @@ class PlayerWindow(QMainWindow):
     # Refresh button
     def refreshMode(self):
         self.timer.stop()
+        completed = False
         with open("songs.json", "r", encoding="utf-8") as file:
             songs_list = json.load(file)
         window.setEnabled(False)
@@ -241,7 +242,8 @@ class PlayerWindow(QMainWindow):
         nr_of_files = len(os.listdir("songs"))
         try:
             fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
-            if fname:
+            if not len(fname[0]) == 0:
+                print("Here")
                 nr = len(fname[0])
                 for i in range(nr):
                     path = fname[0][i].split("/")
@@ -249,9 +251,25 @@ class PlayerWindow(QMainWindow):
                     file_name = file_name_with_ext.rsplit(".", 1)[0]
 
                     try:
-                        info_song = file_name.split("-")
-                        song_name = info_song[0]
-                        artist = info_song[1]
+                        info_song = file_name.split('-')
+                        print(info_song)
+                        if len(info_song) == 2:
+                            song_name = info_song[0].rstrip()
+                            artist = info_song[1].strip()
+                            print("1")
+                        elif len(info_song) == 1:
+                            song_name = info_song[0].rstrip().strip()
+                            artist = ""
+                            print("2")
+                        elif len(info_song) > 2:
+                            song_name = file_name.rstrip().strip()
+                            artist = ""
+                            print("3")
+                        else:
+                            song_name = ""
+                            artist = ""
+                            print("4")
+                        print("5")
                     except Exception as e:
                         print(e)
                         song_name = ""
@@ -264,7 +282,7 @@ class PlayerWindow(QMainWindow):
                         upload.start("next", file_name_with_ext, song_name, artist, nr_of_files)
                     while upload.isVisible():
                         QApplication.processEvents()
-                        pass
+
                     shutil.copy(fname[0][i], "./songs/" + str(nr_of_files) + ".mp3")
 
                     if str(upload.ui.textEditName.toPlainText()) == "":
@@ -289,17 +307,20 @@ class PlayerWindow(QMainWindow):
                         "cover": upload.file_name_final
                     })
                     nr_of_files += 1
+                completed = True
         except Exception as e:
+            completed = False
             print(e)
-        songs_list["Songs"].sort(key=lambda x: x["id"])
-        with open("songs.json", "w", encoding="utf-8") as file:
-            json.dump(songs_list, file, indent=4)
-        self.readSongs()
+        if completed:
+            songs_list["Songs"].sort(key=lambda x: x["id"])
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(songs_list, file, indent=4)
+            self.readSongs()
         self.timer.start()
         window.setEnabled(True)
 
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     # Tray menu
     def open_tray_button(self):
@@ -453,6 +474,7 @@ class PlayerWindow(QMainWindow):
 
     # Timer
     def time_hit(self):
+        self.checkStyle()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():

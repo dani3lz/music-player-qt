@@ -388,7 +388,7 @@ class Ui_MainWindow(object):
         self.listWidget.setGeometry(QtCore.QRect(250, 170, 801, 485))
         self.listWidget.setStyleSheet("QListView\n"
 "{\n"
-"  background-color: #000;\n"
+"  background-color: #070202;\n"
 "  alternate-background-color: transparent;\n"
 "   border : none;\n"
 "   color: #fff;\n"
@@ -399,7 +399,7 @@ class Ui_MainWindow(object):
 "QListView::disabled\n"
 "{\n"
 "   background-color: #000;\n"
-"   color: #212112;\n"
+"   color: #212121;\n"
 "    border: none;\n"
 "}\n"
 "QListView::item\n"

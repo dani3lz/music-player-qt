@@ -39,7 +39,6 @@ class UploadWindow(QMainWindow):
 
     def finish(self):
         self.hide()
-        self.done = True
 
 
     def select_cover(self):
@@ -47,7 +46,7 @@ class UploadWindow(QMainWindow):
         if not os.path.exists('covers'):
             os.makedirs('covers')
         try:
-            fname = QFileDialog.getOpenFileName(self, "Open File", "", "JPG (*.jpg);; PNG (*.png)")
+            fname = QFileDialog.getOpenFileName(self, "Open File", "", "Images (*.png *.xpm *.jpg)")
             if fname:
                 self.ui.coverLabelInfo.setText(fname[0])
                 path = fname[0].split("/")
@@ -59,3 +58,6 @@ class UploadWindow(QMainWindow):
         except Exception as e:
             print(e)
         self.file_name_final = final
+
+    def closeEvent(self, event):
+        event.accept()
