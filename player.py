@@ -83,7 +83,7 @@ class PlayerWindow(QMainWindow):
         self.ui.refreshButton.clicked.connect(self.refreshMode)
         self.ui.playButton.setIcon(QIcon("play.png"))
         self.ui.volumeButton.clicked.connect(self.mute)
-        #self.ui.offlineButton.clicked.connect(self.set_offline_mode)
+        # self.ui.offlineButton.clicked.connect(self.set_offline_mode)
         self.ui.aboutButton.clicked.connect(self.aboutButton)
         self.ui.closeButton.clicked.connect(self.closeButton_clicked)
         self.ui.minimizeButton.clicked.connect(self.minimizeButton_clicked)
@@ -138,18 +138,18 @@ class PlayerWindow(QMainWindow):
 
         tray_menu = QMenu()
         tray_menu.setStyleSheet("QMenu{\n"
-                                    "background-color: #181818;\n"
-                                    "color: #EAE9E9;}\n"
-                                    "QMenu::item{\n"
-                                    "}\n"
+                                "background-color: #181818;\n"
+                                "color: #EAE9E9;}\n"
+                                "QMenu::item{\n"
+                                "}\n"
                                 "\n"
                                 "QMenu::item:selected{\n"
-                                    "background: #252525;}\n"
+                                "background: #252525;}\n"
                                 "\n"
                                 "QMenu::separator{\n"
-                                    "height: 10px;\n"
-                                    "margin-left: 10px;\n"
-                                    "margin-right: 5px;}")
+                                "height: 10px;\n"
+                                "margin-left: 10px;\n"
+                                "margin-right: 5px;}")
         tray_menu.addAction(show_action)
         tray_menu.addSeparator()
         tray_menu.addAction(github_action)
@@ -160,9 +160,10 @@ class PlayerWindow(QMainWindow):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.activated.connect(self.systemIcon)
         self.tray_icon.show()
-# -----------------------------------------------------------------------------------------------------------------------
 
-        # Read Songs NEW
+    # -----------------------------------------------------------------------------------------------------------------------
+
+    # Read Songs NEW
     def readSongs(self):
         if not os.path.exists('songs'):
             os.makedirs('songs')
@@ -229,7 +230,6 @@ class PlayerWindow(QMainWindow):
         except Exception as e:
             print(e)
 
-
     # Refresh button
     def refreshMode(self):
         self.timer.stop()
@@ -243,7 +243,6 @@ class PlayerWindow(QMainWindow):
         try:
             fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
             if not len(fname[0]) == 0:
-                print("Here")
                 nr = len(fname[0])
                 for i in range(nr):
                     path = fname[0][i].split("/")
@@ -252,53 +251,46 @@ class PlayerWindow(QMainWindow):
 
                     try:
                         info_song = file_name.split('-')
-                        print(info_song)
                         if len(info_song) == 2:
                             song_name = info_song[0].rstrip()
                             artist = info_song[1].strip()
-                            print("1")
                         elif len(info_song) == 1:
                             song_name = info_song[0].rstrip().strip()
                             artist = ""
-                            print("2")
                         elif len(info_song) > 2:
                             song_name = file_name.rstrip().strip()
                             artist = ""
-                            print("3")
                         else:
                             song_name = ""
                             artist = ""
-                            print("4")
-                        print("5")
                     except Exception as e:
                         print(e)
+                        print("info_song")
                         song_name = ""
                         artist = ""
 
-
-                    if i == (nr - 1):
-                        upload.start("final", file_name_with_ext, song_name, artist, nr_of_files)
-                    else:
-                        upload.start("next", file_name_with_ext, song_name, artist, nr_of_files)
-                    while upload.isVisible():
+                    upload.start(file_name_with_ext, song_name, artist, nr_of_files, i, nr)
+                    while not upload.done:
                         QApplication.processEvents()
 
-                    shutil.copy(fname[0][i], "./songs/" + str(nr_of_files) + ".mp3")
+                    upload.done = False
 
-                    if str(upload.ui.textEditName.toPlainText()) == "":
+                    if str(upload.ui.lineEditName.text()) == "":
                         song_name = "Undefined"
                     else:
-                        song_name = str(upload.ui.textEditName.toPlainText())
+                        song_name = str(upload.ui.lineEditName.text())
 
-                    if str(upload.ui.textEdit_2.toPlainText()) == "":
+                    if str(upload.ui.lineEditArtist.text()) == "":
                         artist = "Undefined"
                     else:
-                        artist = str(upload.ui.textEdit_2.toPlainText())
+                        artist = str(upload.ui.lineEditArtist.text())
 
-                    upload.ui.textEditName.clear()
-                    upload.ui.textEdit_2.clear()
+                    upload.ui.lineEditName.clear()
+                    upload.ui.lineEditArtist.clear()
                     upload.ui.coverLabelInfo.clear()
                     upload.ui.selectedFileInfo.clear()
+
+                    shutil.copy(fname[0][i], "./songs/" + str(nr_of_files) + ".mp3")
 
                     songs_list["Songs"].append({
                         "id": nr_of_files,
@@ -306,12 +298,14 @@ class PlayerWindow(QMainWindow):
                         "artist": artist,
                         "cover": upload.file_name_final
                     })
+
                     nr_of_files += 1
                 completed = True
         except Exception as e:
             completed = False
             print(e)
         if completed:
+            upload.skip_clicked = False
             songs_list["Songs"].sort(key=lambda x: x["id"])
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list, file, indent=4)
@@ -319,8 +313,7 @@ class PlayerWindow(QMainWindow):
         self.timer.start()
         window.setEnabled(True)
 
-
-# ----------------------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------------
 
     # Tray menu
     def open_tray_button(self):
@@ -346,7 +339,6 @@ class PlayerWindow(QMainWindow):
                 else:
                     self.activateWindow()
 
-
     # Check mouse press event
     def mousePressEvent(self, event):
         self.start = self.mapToGlobal(event.pos())
@@ -354,13 +346,14 @@ class PlayerWindow(QMainWindow):
 
     # Drag app
     def mouseMoveEvent(self, event):
-        if self.pressing and (self.ui.titleBarLabel.underMouse() or self.ui.titleBarInfoLabel.underMouse() or self.ui.titleBarTitle.underMouse()):
+        if self.pressing and (
+                self.ui.titleBarLabel.underMouse() or self.ui.titleBarInfoLabel.underMouse() or self.ui.titleBarTitle.underMouse()):
             self.end = self.mapToGlobal(event.pos())
             self.movement = self.end - self.start
             self.setGeometry(self.mapToGlobal(self.movement).x(),
-                                    self.mapToGlobal(self.movement).y(),
-                                    self.width(),
-                                    self.height())
+                             self.mapToGlobal(self.movement).y(),
+                             self.width(),
+                             self.height())
             self.start = self.end
 
     # Minimize App
@@ -417,7 +410,6 @@ class PlayerWindow(QMainWindow):
     def setVolume(self):
         self.volume = self.ui.volumeSlider.value()
         self.player.setVolume(self.volume)
-
 
     # Change music using the list
     def changeSong(self):
@@ -554,7 +546,6 @@ class PlayerWindow(QMainWindow):
             self.isPlaying = False
             self.checkStyle()
 
-
     # Next button
     def next(self):
         self.playlist.next()
@@ -624,10 +615,10 @@ class PlayerWindow(QMainWindow):
     def checkstylebuttons(self):
         if self.shuffle:
             self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/shuffle_on.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+                                                "border-image: url(img/shuffle_on.png);\n"
+                                                "background: none;\n"
+                                                "border: none;\n"
+                                                "background-repeat: none;")
         else:
             self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
                                                 "border-image: url(img/shuffle.png);\n"
@@ -637,10 +628,10 @@ class PlayerWindow(QMainWindow):
 
         if self.repeatthis and not self.repeatonce:
             self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
-                                                "border-image: url(img/repeatthis_on.png);\n"
-                                                "background: none;\n"
-                                                "border: none;\n"
-                                                "background-repeat: none;")
+                                             "border-image: url(img/repeatthis_on.png);\n"
+                                             "background: none;\n"
+                                             "border: none;\n"
+                                             "background-repeat: none;")
         elif not self.repeatthis and self.repeatonce:
             self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
                                              "border-image: url(img/repeatonce.png);\n"
@@ -658,72 +649,72 @@ class PlayerWindow(QMainWindow):
         if self.isEnabled():
             if self.ui.aboutButton.underMouse():
                 self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
-                                               "border-image: url(img/about_focus.png);\n"
-                                               "background: none;\n"
-                                               "border: none;\n"
-                                               "background-repeat: none;")
+                                                  "border-image: url(img/about_focus.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
             else:
                 self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
-                                               "border-image: url(img/about.png);\n"
-                                               "background: none;\n"
-                                               "border: none;\n"
-                                               "background-repeat: none;")
+                                                  "border-image: url(img/about.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
             if self.ui.musicSlider.underMouse():
                 self.ui.musicSlider.setStyleSheet("QSlider{\n"
-                                                    "    background-color: transparent;\n"
-                                                    "}\n"
-                                                    "QSlider::groove:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: transparent;\n"
-                                                    "    height: 3px;\n"
-                                                    "}\n"
-                                                    "QSlider::sub-page:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-                                                    "}\n"
-                                                    "QSlider::add-page:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: rgb(118, 118, 118);\n"
-                                                    "}\n"
-                                                    "QSlider::handle:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: rgb(216, 216, 216);\n"
-                                                    "    width: 14px;\n"
-                                                    "    margin: -5px;\n"
-                                                    "    border-radius: 6px;\n"
-                                                    "}\n"
-                                                    "QSlider::handle:horizontal:hover \n"
-                                                    "{\n"
-                                                    "    background-color: rgb(240, 240, 240);\n"
-                                                    "}")
+                                                  "    background-color: transparent;\n"
+                                                  "}\n"
+                                                  "QSlider::groove:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: transparent;\n"
+                                                  "    height: 3px;\n"
+                                                  "}\n"
+                                                  "QSlider::sub-page:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                                  "}\n"
+                                                  "QSlider::add-page:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: rgb(118, 118, 118);\n"
+                                                  "}\n"
+                                                  "QSlider::handle:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: rgb(216, 216, 216);\n"
+                                                  "    width: 14px;\n"
+                                                  "    margin: -5px;\n"
+                                                  "    border-radius: 6px;\n"
+                                                  "}\n"
+                                                  "QSlider::handle:horizontal:hover \n"
+                                                  "{\n"
+                                                  "    background-color: rgb(240, 240, 240);\n"
+                                                  "}")
             else:
                 self.ui.musicSlider.setStyleSheet("QSlider{\n"
-                                                    "    background-color: transparent;\n"
-                                                    "}\n"
-                                                    "QSlider::groove:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: transparent;\n"
-                                                    "    height: 3px;\n"
-                                                    "}\n"
-                                                    "QSlider::sub-page:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-                                                    "}\n"
-                                                    "QSlider::add-page:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: rgb(118, 118, 118);\n"
-                                                    "}\n"
-                                                    "QSlider::handle:horizontal \n"
-                                                    "{\n"
-                                                    "    background-color: transparent;\n"
-                                                    "    width: 14px;\n"
-                                                    "    margin: -5px;\n"
-                                                    "    border-radius: 6px;\n"
-                                                    "}\n"
-                                                    "QSlider::handle:horizontal:hover \n"
-                                                    "{\n"
-                                                    "    background-color: rgb(240, 240, 240);\n"
-                                                    "}")
+                                                  "    background-color: transparent;\n"
+                                                  "}\n"
+                                                  "QSlider::groove:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: transparent;\n"
+                                                  "    height: 3px;\n"
+                                                  "}\n"
+                                                  "QSlider::sub-page:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                                  "}\n"
+                                                  "QSlider::add-page:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: rgb(118, 118, 118);\n"
+                                                  "}\n"
+                                                  "QSlider::handle:horizontal \n"
+                                                  "{\n"
+                                                  "    background-color: transparent;\n"
+                                                  "    width: 14px;\n"
+                                                  "    margin: -5px;\n"
+                                                  "    border-radius: 6px;\n"
+                                                  "}\n"
+                                                  "QSlider::handle:horizontal:hover \n"
+                                                  "{\n"
+                                                  "    background-color: rgb(240, 240, 240);\n"
+                                                  "}")
 
             if self.ui.playButton.underMouse():
                 if not self.isPlaying:
@@ -783,54 +774,55 @@ class PlayerWindow(QMainWindow):
             if self.ui.volumeButton.underMouse():
                 if self.ui.volumeSlider.value() == 0:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/mute_focus.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/mute_focus.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/low_focus.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/low_focus.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/medium_focus.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/medium_focus.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/max_focus.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/max_focus.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
 
             else:
                 if self.ui.volumeSlider.value() == 0:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                "border-image: url(img/mute.png);\n"
-                                                "background: none;\n"
-                                                "border: none;\n"
-                                                "background-repeat: none;")
+                                                       "border-image: url(img/mute.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/low.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/low.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/medium.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/medium.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                    "border-image: url(img/max.png);\n"
-                                                    "background: none;\n"
-                                                    "border: none;\n"
-                                                    "background-repeat: none;")
+                                                       "border-image: url(img/max.png);\n"
+                                                       "background: none;\n"
+                                                       "border: none;\n"
+                                                       "background-repeat: none;")
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
