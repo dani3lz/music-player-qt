@@ -23,11 +23,25 @@ class UploadWindow(QMainWindow):
         self.file_name_final = "Undefined"
         self.skip_clicked = False
         self.done = False
+        self.cancel_edit = False
 
         # Connect button
         self.ui.pushButton_Ok.clicked.connect(self.finish)
         self.ui.pushButton_Cover.clicked.connect(self.select_cover)
         self.ui.pushButton_Skip.clicked.connect(self.skip_btn)
+
+    def edit_btn(self, id_song, title, artist, cover):
+        self.setWindowTitle("Edit")
+        self.ui.pushButton_Skip.setText("Cancel")
+        self.ui.pushButton_Ok.setText("Ok")
+        self.nr = id_song
+        file_name = str(id_song) + ".mp3"
+        self.ui.selectedFileInfo.setText(file_name)
+        self.ui.lineEditName.setText(title)
+        self.ui.lineEditArtist.setText(artist)
+        self.ui.coverLabelInfo.setText(cover)
+        self.show()
+
 
     def start(self, file_name, song_name, artist, nr_of_files, current_nr, end_nr):
         if self.skip_clicked:
@@ -54,9 +68,14 @@ class UploadWindow(QMainWindow):
         self.done = True
 
     def skip_btn(self):
-        self.skip_clicked = True
-        self.done = True
-        self.hide()
+        if self.windowTitle() == "Edit":
+            self.cancel_edit = True
+            self.done = True
+            self.hide()
+        else:
+            self.skip_clicked = True
+            self.done = True
+            self.hide()
 
     def select_cover(self):
         final = "Undefined"

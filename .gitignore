@@ -4,3 +4,4 @@ songs.json
 settings.json
 __pycache__/
 test/
+.idea/

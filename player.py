@@ -56,6 +56,7 @@ class PlayerWindow(QMainWindow):
         self.newIndex = -1
         self.playlist.setPlaybackMode(3)
         self.ui.listWidget.setCurrentRow(0)
+        self.ui.imgLabel.setPixmap(QPixmap("img/no_image.jpg").scaled(self.ui.imgLabel.width(), self.ui.imgLabel.width()))
 
         # Check if exist first song in file
         try:
@@ -83,7 +84,7 @@ class PlayerWindow(QMainWindow):
         self.ui.uploadButton.clicked.connect(self.upload_btn)
         self.ui.playButton.setIcon(QIcon("play.png"))
         self.ui.volumeButton.clicked.connect(self.mute)
-        # self.ui.offlineButton.clicked.connect(self.set_offline_mode)
+        self.ui.offlineButton.clicked.connect(self.edit_btn)
         self.ui.deleteButton.clicked.connect(self.delete_btn)
         self.ui.aboutButton.clicked.connect(self.aboutButton)
         self.ui.closeButton.clicked.connect(self.closeButton_clicked)
@@ -219,13 +220,16 @@ class PlayerWindow(QMainWindow):
 
         except Exception as e:
             print(e)
-            self.row = 0
-            self.ui.titleLabel.setText(self.titles[self.row])
-            self.ui.artistLabel.setText(self.artists[self.row])
-            self.player.setPlaylist(self.playlist)
-            self.currentIndex = self.row
-            self.player.playlist().setCurrentIndex(self.currentIndex)
-            self.ui.listWidget.setCurrentRow(self.currentIndex)
+            try:
+                self.row = 0
+                self.ui.titleLabel.setText(self.titles[self.row])
+                self.ui.artistLabel.setText(self.artists[self.row])
+                self.player.setPlaylist(self.playlist)
+                self.currentIndex = self.row
+                self.player.playlist().setCurrentIndex(self.currentIndex)
+                self.ui.listWidget.setCurrentRow(self.currentIndex)
+            except Exception as e:
+                print(e)
 
         self.checkCover()
 
@@ -333,6 +337,7 @@ class PlayerWindow(QMainWindow):
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list, file, indent=4)
             self.readSongs()
+            self.text_item = self.ui.listWidget.currentItem().text()
         self.timer.start()
         window.setEnabled(True)
 
@@ -383,6 +388,75 @@ class PlayerWindow(QMainWindow):
                 json.dump(songs_list_new, file, indent=4)
             self.isPlaying = False
             self.readSongs()
+
+    def edit_btn(self):
+        self.timer.stop()
+        self.setEnabled(False)
+        id_selected = self.row
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                songs_list = json.load(file)
+            open_file = True
+        except:
+            print("No songs!")
+            open_file = False
+
+        if open_file:
+            songs_list_new = {}
+            songs_list_new["Songs"] = []
+
+            for song in songs_list["Songs"]:
+                if song["id"] == id_selected:
+                    upload.edit_btn(song["id"], song["title"], song["artist"], song["cover"])
+                    while not upload.done:
+                        QApplication.processEvents()
+                    upload.done = False
+                    if upload.cancel_edit:
+                        upload.cancel_edit = False
+                        songs_list_new["Songs"].append({
+                            "id": song["id"],
+                            "title": song["title"],
+                            "artist": song["artist"],
+                            "cover": song["cover"]
+                        })
+                    else:
+
+                        if str(upload.ui.lineEditName.text()) == "":
+                            song_name = "Undefined"
+                        else:
+                            song_name = str(upload.ui.lineEditName.text())
+
+                        if str(upload.ui.lineEditArtist.text()) == "":
+                            artist = "Undefined"
+                        else:
+                            artist = str(upload.ui.lineEditArtist.text())
+
+                        songs_list_new["Songs"].append({
+                            "id": song["id"],
+                            "title": song_name,
+                            "artist": artist,
+                            "cover": upload.file_name_final
+                        })
+
+                    upload.ui.lineEditName.clear()
+                    upload.ui.lineEditArtist.clear()
+                    upload.ui.coverLabelInfo.clear()
+                    upload.ui.selectedFileInfo.clear()
+                    upload.ui.pushButton_Skip.setText("Skip all")
+                else:
+                    songs_list_new["Songs"].append({
+                        "id": song["id"],
+                        "title": song["title"],
+                        "artist": song["artist"],
+                        "cover": song["cover"]
+                    })
+
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(songs_list_new, file, indent=4)
+            self.isPlaying = False
+            self.readSongs()
+            self.timer.start()
+            window.setEnabled(True)
 
     # ----------------------------------------------------------------------------------------------------------------------
 
@@ -578,7 +652,7 @@ class PlayerWindow(QMainWindow):
             else:
                 self.imgsrc = QPixmap("covers/" + self.covers[self.currentIndex])
             self.w = self.ui.imgLabel.width()
-            self.h = self.ui.imgLabel.height()
+            self.h = self.ui.imgLabel.width()
             self.ui.imgLabel.setPixmap(self.imgsrc.scaled(self.w, self.h))
         except Exception as e:
             print(e)
