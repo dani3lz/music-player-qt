@@ -314,13 +314,43 @@ class Ui_MainWindow(object):
         self.imgLabel.setGeometry(QtCore.QRect(60, 180, 150, 150))
         self.imgLabel.setStyleSheet("background: transparent;\n"
 "")
+        self.deleteButton = QtWidgets.QPushButton(self.groupBox)
+        self.deleteButton.setGeometry(QtCore.QRect(160, 360, 43, 31))
+        self.deleteButton.setStyleSheet("QPushButton\n"
+                                        "{\n"
+                                        "    background-color: #ff3333;\n"
+                                        "    color: #fff;\n"
+                                        "    font-size: 11px;\n"
+                                        "    font-weight: bold;\n"
+                                        "    border: none;\n"
+                                        "    border-radius: 25px;\n"
+                                        "    padding: 5px;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QPushButton::disabled\n"
+                                        "{\n"
+                                        "    background-color: #5c5c5c;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QPushButton::pressed\n"
+                                        "{\n"
+                                        "    background-color: #ff4747;\n"
+                                        "\n"
+                                        "}\n"
+                                        "")
+        self.deleteButton.setObjectName("deleteButton")
+
         self.imgLabel.setText("")
         self.imgLabel.setObjectName("imgLabel")
-        self.refreshButton = QtWidgets.QPushButton(self.groupBox)
-        self.refreshButton.setGeometry(QtCore.QRect(20, 585, 74, 31))
-        self.refreshButton.setStyleSheet("QPushButton\n"
+        self.uploadButton = QtWidgets.QPushButton(self.groupBox)
+        self.uploadButton.setGeometry(QtCore.QRect(20, 585, 50, 31))
+        self.uploadButton.setStyleSheet("QPushButton\n"
 "{\n"
-"    background-color: #ff3333;\n"
+"    background-color: #138039;\n"
 "    color: #fff;\n"
 "    font-size: 11px;\n"
 "    font-weight: bold;\n"
@@ -340,16 +370,16 @@ class Ui_MainWindow(object):
 "\n"
 "QPushButton::pressed\n"
 "{\n"
-"    background-color: #ff4747;\n"
+"    background-color: #1DB954;\n"
 "\n"
 "}\n"
 "")
-        self.refreshButton.setObjectName("refreshButton")
+        self.uploadButton.setObjectName("uploadButton")
 
 #-----------------------
 
         self.offlineButton = QtWidgets.QPushButton(self.groupBox)
-        self.offlineButton.setGeometry(QtCore.QRect(112, 360, 43, 31))
+        self.offlineButton.setGeometry(QtCore.QRect(60, 360, 43, 31))
         self.offlineButton.setStyleSheet("background-color: transparent;\n"
                                          "border-image: url(img/offline_off.png);\n"
                                          "background: none;\n"
@@ -359,7 +389,7 @@ class Ui_MainWindow(object):
         self.offlineButton.setObjectName("offlineButton")
 
         self.aboutButton = QtWidgets.QPushButton(self.groupBox)
-        self.aboutButton.setGeometry(QtCore.QRect(105, 591, 20, 20))
+        self.aboutButton.setGeometry(QtCore.QRect(225, 591, 20, 20))
         self.aboutButton.setStyleSheet("background-color: transparent;\n"
                                          "border-image: url(img/about.png);\n"
                                          "background: none;\n"
@@ -380,7 +410,8 @@ class Ui_MainWindow(object):
         self.titleBarLabel.raise_()
         self.titleBarTitle.raise_()
         self.titleBarInfoLabel.raise_()
-        self.refreshButton.raise_()
+        self.uploadButton.raise_()
+        self.deleteButton.raise_()
         self.closeButton.raise_()
         self.minimizeButton.raise_()
         self.offlineButton.raise_()
@@ -436,7 +467,8 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.durationLabel.setText(_translate("MainWindow", "0.00 / 0.00"))
-        self.refreshButton.setText(_translate("MainWindow", "Upload"))
+        self.uploadButton.setText(_translate("MainWindow", "Upload"))
+        self.deleteButton.setText(_translate("MainWindow", "Delete"))
         self.closeButton.setText(_translate("MainWindow", "✕"))
         self.minimizeButton.setText(_translate("MainWindow", "🗕"))
 

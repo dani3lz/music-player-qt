@@ -80,10 +80,11 @@ class PlayerWindow(QMainWindow):
         self.ui.prevButton.clicked.connect(self.prev)
         self.ui.shuffleButton.clicked.connect(self.shuffleMode)
         self.ui.repeatThis.clicked.connect(self.repeatThisMode)
-        self.ui.refreshButton.clicked.connect(self.refreshMode)
+        self.ui.uploadButton.clicked.connect(self.upload_btn)
         self.ui.playButton.setIcon(QIcon("play.png"))
         self.ui.volumeButton.clicked.connect(self.mute)
         # self.ui.offlineButton.clicked.connect(self.set_offline_mode)
+        self.ui.deleteButton.clicked.connect(self.delete_btn)
         self.ui.aboutButton.clicked.connect(self.aboutButton)
         self.ui.closeButton.clicked.connect(self.closeButton_clicked)
         self.ui.minimizeButton.clicked.connect(self.minimizeButton_clicked)
@@ -203,7 +204,6 @@ class PlayerWindow(QMainWindow):
                     mp3.delete()
                 except Exception as e:
                     print(e)'''
-
                 self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                 self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
         except Exception as e:
@@ -216,8 +216,26 @@ class PlayerWindow(QMainWindow):
             self.currentIndex = self.row
             self.player.playlist().setCurrentIndex(self.currentIndex)
             self.ui.listWidget.setCurrentRow(self.currentIndex)
-            self.checkCover()
+
+        except Exception as e:
+            print(e)
+            self.row = 0
+            self.ui.titleLabel.setText(self.titles[self.row])
+            self.ui.artistLabel.setText(self.artists[self.row])
+            self.player.setPlaylist(self.playlist)
+            self.currentIndex = self.row
+            self.player.playlist().setCurrentIndex(self.currentIndex)
+            self.ui.listWidget.setCurrentRow(self.currentIndex)
+
+        self.checkCover()
+
+        try:
             self.player.setVolume(self.volume)
+        except Exception as e:
+            print(e)
+            self.player.setVolume(50)
+
+        try:
             if self.mode == "Shuffle":
                 self.playlist.setPlaybackMode(4)
             elif self.mode == "Repeat This":
@@ -229,13 +247,18 @@ class PlayerWindow(QMainWindow):
                 self.playlist.setPlaybackMode(3)
         except Exception as e:
             print(e)
+            self.playlist.setPlaybackMode(3)
 
-    # Refresh button
-    def refreshMode(self):
+    # Upload button
+    def upload_btn(self):
         self.timer.stop()
         completed = False
-        with open("songs.json", "r", encoding="utf-8") as file:
-            songs_list = json.load(file)
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                songs_list = json.load(file)
+        except:
+            songs_list = {}
+            songs_list["Songs"] = []
         window.setEnabled(False)
         if not os.path.exists('songs'):
             os.makedirs('songs')
@@ -252,8 +275,8 @@ class PlayerWindow(QMainWindow):
                     try:
                         info_song = file_name.split('-')
                         if len(info_song) == 2:
-                            song_name = info_song[0].rstrip()
-                            artist = info_song[1].strip()
+                            song_name = info_song[1].rstrip().strip()
+                            artist = info_song[0].strip().rstrip()
                         elif len(info_song) == 1:
                             song_name = info_song[0].rstrip().strip()
                             artist = ""
@@ -312,6 +335,54 @@ class PlayerWindow(QMainWindow):
             self.readSongs()
         self.timer.start()
         window.setEnabled(True)
+
+    def delete_btn(self):
+        id_selected = self.row
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                songs_list = json.load(file)
+            open_file = True
+        except:
+            print("No songs!")
+            open_file = False
+
+        if open_file:
+            last_id = 0
+            songs_list_new = {}
+            songs_list_new["Songs"] = []
+
+            for song in songs_list["Songs"]:
+                if song["id"] == id_selected:
+                    os.remove("./songs/" + str(id_selected) + ".mp3")
+                    if not song["cover"] == "Undefined":
+                        os.remove("./covers/" + song["cover"])
+                else:
+                    os.rename("./songs/" + str(song["id"]) + ".mp3", "./songs/" + str(last_id) + ".mp3")
+                    if not song["cover"] == "Undefined":
+                        cover_name_with_ex = song["cover"]
+                        ext = cover_name_with_ex.split(".")[1]
+                        cover_new_name = str(last_id) + "." + ext
+                        os.rename("./covers/" + song["cover"], "./covers/" + cover_new_name)
+                        songs_list_new["Songs"].append({
+                            "id": last_id,
+                            "title": song["title"],
+                            "artist": song["artist"],
+                            "cover": cover_new_name
+                        })
+                    else:
+                        songs_list_new["Songs"].append({
+                            "id": last_id,
+                            "title": song["title"],
+                            "artist": song["artist"],
+                            "cover": song["cover"]
+                        })
+
+                    last_id += 1
+
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(songs_list_new, file, indent=4)
+            self.isPlaying = False
+            self.readSongs()
 
     # ----------------------------------------------------------------------------------------------------------------------
 
