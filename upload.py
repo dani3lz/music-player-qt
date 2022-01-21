@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QFileDialog
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 from uploadUI import Ui_Form
 import os
 import sys
@@ -18,6 +19,7 @@ class UploadWindow(QMainWindow):
         self.setWindowTitle("Upload")
         self.setWindowIcon(QIcon('linux_player.ico'))
         self.setFixedSize(self.width(), self.height())
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Var
         self.file_name_final = "Undefined"

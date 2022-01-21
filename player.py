@@ -217,6 +217,7 @@ class PlayerWindow(QMainWindow):
             self.currentIndex = self.row
             self.player.playlist().setCurrentIndex(self.currentIndex)
             self.ui.listWidget.setCurrentRow(self.currentIndex)
+            self.text_item = self.ui.listWidget.currentItem().text()
 
         except Exception as e:
             print(e)
@@ -228,6 +229,7 @@ class PlayerWindow(QMainWindow):
                 self.currentIndex = self.row
                 self.player.playlist().setCurrentIndex(self.currentIndex)
                 self.ui.listWidget.setCurrentRow(self.currentIndex)
+                self.text_item = self.ui.listWidget.currentItem().text()
             except Exception as e:
                 print(e)
 
@@ -337,7 +339,7 @@ class PlayerWindow(QMainWindow):
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list, file, indent=4)
             self.readSongs()
-            self.text_item = self.ui.listWidget.currentItem().text()
+        self.isPlaying = False
         self.timer.start()
         window.setEnabled(True)
 
