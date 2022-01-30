@@ -135,7 +135,7 @@ class Ui_MainWindow(object):
         self.durationLabel = QtWidgets.QLabel(self.groupBox)
         self.durationLabel.setGeometry(QtCore.QRect(790, 64, 61, 21))
         font = QtGui.QFont()
-        font.setPointSize(9)
+        font.setPointSize(8)
         self.durationLabel.setFont(font)
         self.durationLabel.setStyleSheet("color: white;\n"
 "background: none;")
@@ -315,33 +315,12 @@ class Ui_MainWindow(object):
         self.imgLabel.setStyleSheet("background: transparent;\n"
 "")
         self.deleteButton = QtWidgets.QPushButton(self.groupBox)
-        self.deleteButton.setGeometry(QtCore.QRect(160, 360, 43, 31))
-        self.deleteButton.setStyleSheet("QPushButton\n"
-                                        "{\n"
-                                        "    background-color: #ff3333;\n"
-                                        "    color: #fff;\n"
-                                        "    font-size: 11px;\n"
-                                        "    font-weight: bold;\n"
-                                        "    border: none;\n"
-                                        "    border-radius: 25px;\n"
-                                        "    padding: 5px;\n"
-                                        "\n"
-                                        "}\n"
-                                        "\n"
-                                        "\n"
-                                        "QPushButton::disabled\n"
-                                        "{\n"
-                                        "    background-color: #5c5c5c;\n"
-                                        "\n"
-                                        "}\n"
-                                        "\n"
-                                        "\n"
-                                        "QPushButton::pressed\n"
-                                        "{\n"
-                                        "    background-color: #ff4747;\n"
-                                        "\n"
-                                        "}\n"
-                                        "")
+        self.deleteButton.setGeometry(QtCore.QRect(145, 360, 30, 30))
+        self.deleteButton.setStyleSheet("background-color: transparent;\n"
+                                         "border-image: url(img/delete.png);\n"
+                                         "background: none;\n"
+                                         "border: none;\n"
+                                         "background-repeat: none;")
         self.deleteButton.setObjectName("deleteButton")
 
         self.imgLabel.setText("")
@@ -378,15 +357,15 @@ class Ui_MainWindow(object):
 
 #-----------------------
 
-        self.offlineButton = QtWidgets.QPushButton(self.groupBox)
-        self.offlineButton.setGeometry(QtCore.QRect(60, 360, 43, 31))
-        self.offlineButton.setStyleSheet("background-color: transparent;\n"
-                                         "border-image: url(img/offline_off.png);\n"
+        self.edit_btn = QtWidgets.QPushButton(self.groupBox)
+        self.edit_btn.setGeometry(QtCore.QRect(90, 360, 28, 28))
+        self.edit_btn.setStyleSheet("background-color: transparent;\n"
+                                         "border-image: url(img/edit.png);\n"
                                          "background: none;\n"
                                          "border: none;\n"
                                          "background-repeat: none;")
-        self.offlineButton.setText("")
-        self.offlineButton.setObjectName("offlineButton")
+        self.edit_btn.setText("")
+        self.edit_btn.setObjectName("edit_btn")
 
         self.aboutButton = QtWidgets.QPushButton(self.groupBox)
         self.aboutButton.setGeometry(QtCore.QRect(225, 591, 20, 20))
@@ -414,9 +393,12 @@ class Ui_MainWindow(object):
         self.deleteButton.raise_()
         self.closeButton.raise_()
         self.minimizeButton.raise_()
-        self.offlineButton.raise_()
+        self.edit_btn.raise_()
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
         self.listWidget.setGeometry(QtCore.QRect(250, 170, 801, 485))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.listWidget.setFont(font)
         self.listWidget.setStyleSheet("QListView\n"
 "{\n"
 "  background-color: #070202;\n"
@@ -436,7 +418,7 @@ class Ui_MainWindow(object):
 "QListView::item\n"
 "{\n"                       
 "    background-color: transparent;\n"
-"    padding: 5px;\n"
+"    padding: 4px;\n"
 "}\n"
 "QListView::item:selected:!active\n"
 "{\n"
@@ -468,7 +450,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.durationLabel.setText(_translate("MainWindow", "0.00 / 0.00"))
         self.uploadButton.setText(_translate("MainWindow", "Upload"))
-        self.deleteButton.setText(_translate("MainWindow", "Delete"))
         self.closeButton.setText(_translate("MainWindow", "✕"))
         self.minimizeButton.setText(_translate("MainWindow", "🗕"))
 

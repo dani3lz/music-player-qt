@@ -20,6 +20,7 @@ class UploadWindow(QMainWindow):
         self.setWindowIcon(QIcon('linux_player.ico'))
         self.setFixedSize(self.width(), self.height())
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.setWindowIcon(QIcon('player.ico'))
 
         # Var
         self.file_name_final = "Undefined"
@@ -98,5 +99,7 @@ class UploadWindow(QMainWindow):
         self.file_name_final = final
 
     def closeEvent(self, event):
+        if self.windowTitle() == "Edit":
+            self.cancel_edit = True
         self.done = True
         event.accept()

@@ -84,7 +84,7 @@ class PlayerWindow(QMainWindow):
         self.ui.uploadButton.clicked.connect(self.upload_btn)
         self.ui.playButton.setIcon(QIcon("play.png"))
         self.ui.volumeButton.clicked.connect(self.mute)
-        self.ui.offlineButton.clicked.connect(self.edit_btn)
+        self.ui.edit_btn.clicked.connect(self.edit_btn)
         self.ui.deleteButton.clicked.connect(self.delete_btn)
         self.ui.aboutButton.clicked.connect(self.aboutButton)
         self.ui.closeButton.clicked.connect(self.closeButton_clicked)
@@ -272,14 +272,27 @@ class PlayerWindow(QMainWindow):
         try:
             fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
             if not len(fname[0]) == 0:
+                self.setWindowTitle(name_window + " | Uploading... 0%")
+                self.ui.titleBarInfoLabel.setText("Uploading... 0%")
+                QApplication.processEvents()
                 nr = len(fname[0])
                 for i in range(nr):
+                    percent = round((i / nr) * 100)
+                    self.setWindowTitle(name_window + " | Uploading... " + str(percent) + "%")
+                    self.ui.titleBarInfoLabel.setText("Uploading... " + str(percent) + "%")
+                    QApplication.processEvents()
                     path = fname[0][i].split("/")
                     file_name_with_ext = path[-1]
                     file_name = file_name_with_ext.rsplit(".", 1)[0]
 
                     try:
-                        info_song = file_name.split('-')
+                        if file_name.__contains__("-"):
+                            info_song = file_name.split('-', 1)
+                        elif file_name.__contains__(" "):
+                            info_song = file_name.split(' ', 1)
+                        else:
+                            info_song = file_name
+
                         if len(info_song) == 2:
                             song_name = info_song[1].rstrip().strip()
                             artist = info_song[0].strip().rstrip()
@@ -340,6 +353,8 @@ class PlayerWindow(QMainWindow):
                 json.dump(songs_list, file, indent=4)
             self.readSongs()
         self.isPlaying = False
+        self.setWindowTitle(name_window)
+        self.ui.titleBarInfoLabel.setText("")
         self.timer.start()
         window.setEnabled(True)
 
@@ -394,6 +409,7 @@ class PlayerWindow(QMainWindow):
     def edit_btn(self):
         self.timer.stop()
         self.setEnabled(False)
+        cancel_edit = False
         id_selected = self.row
         try:
             with open("songs.json", "r", encoding="utf-8") as file:
@@ -414,6 +430,7 @@ class PlayerWindow(QMainWindow):
                         QApplication.processEvents()
                     upload.done = False
                     if upload.cancel_edit:
+                        cancel_edit = True
                         upload.cancel_edit = False
                         songs_list_new["Songs"].append({
                             "id": song["id"],
@@ -453,12 +470,16 @@ class PlayerWindow(QMainWindow):
                         "cover": song["cover"]
                     })
 
-            with open("songs.json", "w", encoding="utf-8") as file:
-                json.dump(songs_list_new, file, indent=4)
-            self.isPlaying = False
-            self.readSongs()
-            self.timer.start()
-            window.setEnabled(True)
+            if not cancel_edit:
+                with open("songs.json", "w", encoding="utf-8") as file:
+                    json.dump(songs_list_new, file, indent=4)
+                self.isPlaying = False
+                self.readSongs()
+                self.timer.start()
+                window.setEnabled(True)
+            else:
+                self.timer.start()
+                window.setEnabled(True)
 
     # ----------------------------------------------------------------------------------------------------------------------
 
@@ -614,6 +635,7 @@ class PlayerWindow(QMainWindow):
     # Timer
     def time_hit(self):
         self.checkStyle()
+        self.checkstyleVolume()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
@@ -683,44 +705,47 @@ class PlayerWindow(QMainWindow):
 
     # Play button
     def play(self):
-        if not self.isPlaying:
-            self.player.play()
-            self.isPlaying = True
-            self.newIndex = self.player.playlist().currentIndex()
-            self.checkStyle()
-        else:
-            self.player.pause()
-            self.isPlaying = False
-            self.checkStyle()
+        if len(self.titles) > 0:
+            if not self.isPlaying:
+                self.player.play()
+                self.isPlaying = True
+                self.newIndex = self.player.playlist().currentIndex()
+                self.checkStyle()
+            else:
+                self.player.pause()
+                self.isPlaying = False
+                self.checkStyle()
 
     # Next button
     def next(self):
-        self.playlist.next()
-        self.newIndex = self.player.playlist().currentIndex()
-        if not self.isPlaying:
-            self.player.play()
-            self.isPlaying = True
-            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/pause.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+        if len(self.titles) > 0:
+            self.playlist.next()
+            self.newIndex = self.player.playlist().currentIndex()
+            if not self.isPlaying:
+                self.player.play()
+                self.isPlaying = True
+                self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/pause.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
 
     # Previous button
     def prev(self):
-        if int(self.now_sec) < 10:
-            self.playlist.previous()
-            self.newIndex = self.player.playlist().currentIndex()
-        else:
-            self.player.setPosition(0)
-        if not self.isPlaying:
-            self.player.play()
-            self.isPlaying = True
-            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/pause.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+        if len(self.titles) > 0:
+            if int(self.now_sec) < 10:
+                self.playlist.previous()
+                self.newIndex = self.player.playlist().currentIndex()
+            else:
+                self.player.setPosition(0)
+            if not self.isPlaying:
+                self.player.play()
+                self.isPlaying = True
+                self.ui.playButton.setStyleSheet("background-color: transparent;\n"
+                                                 "border-image: url(img/pause.png);\n"
+                                                 "background: none;\n"
+                                                 "border: none;\n"
+                                                 "background-repeat: none;")
 
     # Repeat This button
     def repeatThisMode(self):
@@ -794,6 +819,30 @@ class PlayerWindow(QMainWindow):
 
     def checkStyle(self):
         if self.isEnabled():
+            if self.ui.deleteButton.underMouse():
+                self.ui.deleteButton.setStyleSheet("background-color: transparent;\n"
+                                                  "border-image: url(img/delete_focus.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
+            else:
+                self.ui.deleteButton.setStyleSheet("background-color: transparent;\n"
+                                                  "border-image: url(img/delete.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
+            if self.ui.edit_btn.underMouse():
+                self.ui.edit_btn.setStyleSheet("background-color: transparent;\n"
+                                                  "border-image: url(img/edit_focus.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
+            else:
+                self.ui.edit_btn.setStyleSheet("background-color: transparent;\n"
+                                                  "border-image: url(img/edit.png);\n"
+                                                  "background: none;\n"
+                                                  "border: none;\n"
+                                                  "background-repeat: none;")
             if self.ui.aboutButton.underMouse():
                 self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
                                                   "border-image: url(img/about_focus.png);\n"
