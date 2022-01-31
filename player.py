@@ -45,7 +45,7 @@ class PlayerWindow(QMainWindow):
 
         # Read file with songs and settings
         self.row = 0
-        self.readSongs()
+        self.read_songs_from_json()
         self.settings_read()
         self.checkCover()
 
@@ -112,7 +112,7 @@ class PlayerWindow(QMainWindow):
         # Check mode
         self.checkMode()
         if os.path.exists('songs'):
-            self.read_songs()
+            self.read_files_songs()
             self.checkstylebuttons()
         else:
             self.checkstylebuttons()
@@ -165,8 +165,8 @@ class PlayerWindow(QMainWindow):
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    # Read Songs NEW
-    def readSongs(self):
+    # read songs from songs.json
+    def read_songs_from_json(self):
         if not os.path.exists('songs'):
             os.makedirs('songs')
         self.player = QMediaPlayer()
@@ -189,10 +189,10 @@ class PlayerWindow(QMainWindow):
                     self.covers.append(i["cover"])
         except Exception as e:
             print(e)
-        self.read_songs()
+        self.read_files_songs()
 
-    # Read all downloaded songs
-    def read_songs(self):
+    # read songs from dir
+    def read_files_songs(self):
         try:
             self.ui.listWidget.clear()
             self.playlist = QMediaPlaylist(self.player)
@@ -200,11 +200,6 @@ class PlayerWindow(QMainWindow):
             count = len(os.listdir("songs"))
             for nr in range(count):
                 song_name = str(nr) + ".mp3"
-                '''try:
-                    mp3 = ID3(song_name)
-                    mp3.delete()
-                except Exception as e:
-                    print(e)'''
                 self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                 self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
         except Exception as e:
@@ -351,13 +346,14 @@ class PlayerWindow(QMainWindow):
             songs_list["Songs"].sort(key=lambda x: x["id"])
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list, file, indent=4)
-            self.readSongs()
+            self.read_songs_from_json()
         self.isPlaying = False
         self.setWindowTitle(name_window)
         self.ui.titleBarInfoLabel.setText("")
         self.timer.start()
         window.setEnabled(True)
 
+    # Delete button
     def delete_btn(self):
         id_selected = self.row
         try:
@@ -404,8 +400,9 @@ class PlayerWindow(QMainWindow):
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list_new, file, indent=4)
             self.isPlaying = False
-            self.readSongs()
+            self.read_songs_from_json()
 
+    # Edit button
     def edit_btn(self):
         self.timer.stop()
         self.setEnabled(False)
@@ -474,14 +471,12 @@ class PlayerWindow(QMainWindow):
                 with open("songs.json", "w", encoding="utf-8") as file:
                     json.dump(songs_list_new, file, indent=4)
                 self.isPlaying = False
-                self.readSongs()
+                self.read_songs_from_json()
                 self.timer.start()
                 window.setEnabled(True)
             else:
                 self.timer.start()
                 window.setEnabled(True)
-
-    # ----------------------------------------------------------------------------------------------------------------------
 
     # Tray menu
     def open_tray_button(self):

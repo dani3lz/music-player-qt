@@ -3,12 +3,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from uploadUI import Ui_Form
 import os
-import sys
-import json
 import shutil
 
 
-# UPLOAD WINDOW ---------------------------------------------------------------------------------------------------------
 class UploadWindow(QMainWindow):
     def __init__(self):
         super(UploadWindow, self).__init__()
@@ -44,7 +41,6 @@ class UploadWindow(QMainWindow):
         self.ui.lineEditArtist.setText(artist)
         self.ui.coverLabelInfo.setText(cover)
         self.show()
-
 
     def start(self, file_name, song_name, artist, nr_of_files, current_nr, end_nr):
         if self.skip_clicked:
