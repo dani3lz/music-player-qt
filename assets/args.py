@@ -13,73 +13,73 @@ tray_menu_css = "QMenu{\n"\
                 "margin-right: 5px;}"
 
 shuffle_off_css = "background-color: transparent;\n"\
-                                                "border-image: url(img/shuffle.png);\n"\
+                                                "border-image: url(assets/img/shuffle.png);\n"\
                                                 "background: none;\n"\
                                                 "border: none;\n"\
                                                 "background-repeat: none;"
 
 shuffle_on_css = "background-color: transparent;\n"\
-                                                "border-image: url(img/shuffle_on.png);\n"\
+                                                "border-image: url(assets/img/shuffle_on.png);\n"\
                                                 "background: none;\n"\
                                                 "border: none;\n"\
                                                 "background-repeat: none;"
 
 repeatonce_off_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/repeatonce.png);\n"\
+                                             "border-image: url(assets/img/repeatonce.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 repeatonce_on_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/repeatonce_on.png);\n"\
+                                             "border-image: url(assets/img/repeatonce_on.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 repeatthis_off_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/repeatthis.png);\n"\
+                                             "border-image: url(assets/img/repeatthis.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 repeatthis_on_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/repeatthis_on.png);\n"\
+                                             "border-image: url(assets/img/repeatthis_on.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 delete_btn_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/delete.png);\n"\
+                                                  "border-image: url(assets/img/delete.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
 
 delete_btn_focus_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/delete_focus.png);\n"\
+                                                  "border-image: url(assets/img/delete_focus.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
 
 edit_btn_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/edit.png);\n"\
+                                                  "border-image: url(assets/img/edit.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
 
 edit_btn_focus_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/edit_focus.png);\n"\
+                                                  "border-image: url(assets/img/edit_focus.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
 
 about_btn_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/about.png);\n"\
+                                                  "border-image: url(assets/img/about.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
 
 about_btn_focus_css = "background-color: transparent;\n"\
-                                                  "border-image: url(img/about_focus.png);\n"\
+                                                  "border-image: url(assets/img/about_focus.png);\n"\
                                                   "background: none;\n"\
                                                   "border: none;\n"\
                                                   "background-repeat: none;"
@@ -142,97 +142,97 @@ musicSlider_focus_css = "QSlider{\n"\
 
 
 pause_btn_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/pause.png);\n"\
+                                             "border-image: url(assets/img/pause.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 pause_btn_focus_css = "background-color: transparent;\n"\
-                                             "border-image: url(img/pause_focus.png);\n"\
+                                             "border-image: url(assets/img/pause_focus.png);\n"\
                                              "background: none;\n"\
                                              "border: none;\n"\
                                              "background-repeat: none;"
 
 play_btn_css = "background-color: transparent;\n"\
-                                                     "border-image: url(img/play.png);\n"\
+                                                     "border-image: url(assets/img/play.png);\n"\
                                                      "background: none;\n"\
                                                      "border: none;\n"\
                                                      "background-repeat: none;"
 
 play_btn_focus_css = "background-color: transparent;\n"\
-                                                     "border-image: url(img/play_focus.png);\n"\
+                                                     "border-image: url(assets/img/play_focus.png);\n"\
                                                      "background: none;\n"\
                                                      "border: none;\n"\
                                                      "background-repeat: none;"
 
 next_btn_css = "background-color: transparent;\n"\
-                                                 "border-image: url(img/next.png);\n"\
+                                                 "border-image: url(assets/img/next.png);\n"\
                                                  "background: none;\n"\
                                                  "border: none;\n"\
                                                  "background-repeat: none;"
 
 next_btn_focus_css = "background-color: transparent;\n"\
-                                                 "border-image: url(img/next_focus.png);\n"\
+                                                 "border-image: url(assets/img/next_focus.png);\n"\
                                                  "background: none;\n"\
                                                  "border: none;\n"\
                                                  "background-repeat: none;"
 
 prev_btn_css = "background-color: transparent;\n"\
-                                                 "border-image: url(img/prev.png);\n"\
+                                                 "border-image: url(assets/img/prev.png);\n"\
                                                  "background: none;\n"\
                                                  "border: none;\n"\
                                                  "background-repeat: none;"
 
 prev_btn_focus_css = "background-color: transparent;\n"\
-                                                 "border-image: url(img/prev_focus.png);\n"\
+                                                 "border-image: url(assets/img/prev_focus.png);\n"\
                                                  "background: none;\n"\
                                                  "border: none;\n"\
                                                  "background-repeat: none;"
 
 volume_mute_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/mute.png);\n"\
+                                                       "border-image: url(assets/img/mute.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_mute_focus_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/mute_focus.png);\n"\
+                                                       "border-image: url(assets/img/mute_focus.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_low_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/low.png);\n"\
+                                                       "border-image: url(assets/img/low.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_low_focus_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/low_focus.png);\n"\
+                                                       "border-image: url(assets/img/low_focus.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_medium_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/medium.png);\n"\
+                                                       "border-image: url(assets/img/medium.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_medium_focus_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/medium_focus.png);\n"\
+                                                       "border-image: url(assets/img/medium_focus.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_max_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/max.png);\n"\
+                                                       "border-image: url(assets/img/max.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
 
 volume_max_focus_css = "background-color: transparent;\n"\
-                                                       "border-image: url(img/max_focus.png);\n"\
+                                                       "border-image: url(assets/img/max_focus.png);\n"\
                                                        "background: none;\n"\
                                                        "border: none;\n"\
                                                        "background-repeat: none;"
