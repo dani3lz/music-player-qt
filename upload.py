@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QFileDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
-from uploadUI import Ui_Form
+from assets.UI.uploadUI import Ui_Form
 import os
 import shutil
 
@@ -17,7 +17,7 @@ class UploadWindow(QMainWindow):
         self.setWindowIcon(QIcon('linux_player.ico'))
         self.setFixedSize(self.width(), self.height())
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.setWindowIcon(QIcon('player.ico'))
+        self.setWindowIcon(QIcon('assets/img/player.ico'))
 
         # Var
         self.file_name_final = "Undefined"

@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
-from playerUI import Ui_MainWindow
+from assets.UI.playerUI import Ui_MainWindow
 import upload
-from args import *
+from assets.args import *
 from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
 import os
 import sys
@@ -27,7 +27,7 @@ class PlayerWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setFixedSize(self.width(), self.height())
         self.setWindowTitle(name_window)
-        self.setWindowIcon(QIcon('player.ico'))
+        self.setWindowIcon(QIcon('assets/img/player.ico'))
 
         # Setup elements Nr.1
         self.first = True
@@ -57,7 +57,7 @@ class PlayerWindow(QMainWindow):
         self.newIndex = -1
         self.playlist.setPlaybackMode(3)
         self.ui.listWidget.setCurrentRow(0)
-        self.ui.imgLabel.setPixmap(QPixmap("img/no_image.jpg").scaled(self.ui.imgLabel.width(), self.ui.imgLabel.width()))
+        self.ui.imgLabel.setPixmap(QPixmap("assets/img/no_image.jpg").scaled(self.ui.imgLabel.width(), self.ui.imgLabel.width()))
 
         # Check if exist first song in file
         try:
@@ -128,9 +128,9 @@ class PlayerWindow(QMainWindow):
 
         # Tray menu
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon("player.ico"))
+        self.tray_icon.setIcon(QIcon("assets/img/player.ico"))
 
-        show_action = QAction(QIcon("player.ico"), "Player", self)
+        show_action = QAction(QIcon("assets/img/player.ico"), "Player", self)
         github_action = QAction("Github", self)
         about_action = QAction("About", self)
         exit_action = QAction("Exit", self)
@@ -526,7 +526,7 @@ class PlayerWindow(QMainWindow):
             self.show()
             self.msg_about = QMessageBox()
             self.msg_about.setWindowTitle("About")
-            self.msg_about.setWindowIcon(QIcon("img/about.ico"))
+            self.msg_about.setWindowIcon(QIcon("assets/img/about.ico"))
             self.msg_about.setText(about_text)
             self.msg_about.show()
         except Exception as e:
@@ -644,7 +644,7 @@ class PlayerWindow(QMainWindow):
     def checkCover(self):
         try:
             if self.covers[self.currentIndex] == "no_image.jpg":
-                self.imgsrc = QPixmap("img/" + self.covers[self.currentIndex])
+                self.imgsrc = QPixmap("assets/img/" + self.covers[self.currentIndex])
             else:
                 self.imgsrc = QPixmap("covers/" + self.covers[self.currentIndex])
             self.w = self.ui.imgLabel.width()
