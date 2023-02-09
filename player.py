@@ -3,6 +3,7 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
 from playerUI import Ui_MainWindow
 import upload
+from args import *
 from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
 import os
 import sys
@@ -139,19 +140,7 @@ class PlayerWindow(QMainWindow):
         exit_action.triggered.connect(qApp.quit)
 
         tray_menu = QMenu()
-        tray_menu.setStyleSheet("QMenu{\n"
-                                "background-color: #181818;\n"
-                                "color: #EAE9E9;}\n"
-                                "QMenu::item{\n"
-                                "}\n"
-                                "\n"
-                                "QMenu::item:selected{\n"
-                                "background: #252525;}\n"
-                                "\n"
-                                "QMenu::separator{\n"
-                                "height: 10px;\n"
-                                "margin-left: 10px;\n"
-                                "margin-right: 5px;}")
+        tray_menu.setStyleSheet(tray_menu_css)
         tray_menu.addAction(show_action)
         tray_menu.addSeparator()
         tray_menu.addAction(github_action)
@@ -163,7 +152,6 @@ class PlayerWindow(QMainWindow):
         self.tray_icon.activated.connect(self.systemIcon)
         self.tray_icon.show()
 
-    # -----------------------------------------------------------------------------------------------------------------------
 
     # read songs from songs.json
     def read_songs_from_json(self):
@@ -539,10 +527,7 @@ class PlayerWindow(QMainWindow):
             self.msg_about = QMessageBox()
             self.msg_about.setWindowTitle("About")
             self.msg_about.setWindowIcon(QIcon("img/about.ico"))
-            self.msg_about.setText("Player<br>"
-                                   "Version: 1.0<br>"
-                                   "Developer: Daniel Zavorot (dani3lz)<br>"
-                                   "Github: <a href='https://github.com/dani3lz/Music_Player'>https://github.com/dani3lz/Music_Player</a>")
+            self.msg_about.setText(about_text)
             self.msg_about.show()
         except Exception as e:
             print(e)
@@ -580,11 +565,7 @@ class PlayerWindow(QMainWindow):
         self.player.playlist().setCurrentIndex(self.row)
         if not self.isPlaying:
             self.player.play()
-            self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/pause.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+            self.ui.playButton.setStyleSheet(pause_btn_css)
             self.isPlaying = True
 
     # Music slider
@@ -655,11 +636,7 @@ class PlayerWindow(QMainWindow):
             if self.repeatonce:
                 if self.now_duration == self.song_duration:
                     self.isPlaying = False
-                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                     "border-image: url(img/play.png);\n"
-                                                     "background: none;\n"
-                                                     "border: none;\n"
-                                                     "background-repeat: none;")
+                    self.ui.playButton.setStyleSheet(play_btn_css)
                     self.player.stop()
         self.settings_write()
 
@@ -719,11 +696,7 @@ class PlayerWindow(QMainWindow):
             if not self.isPlaying:
                 self.player.play()
                 self.isPlaying = True
-                self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/pause.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.playButton.setStyleSheet(pause_btn_css)
 
     # Previous button
     def prev(self):
@@ -736,11 +709,7 @@ class PlayerWindow(QMainWindow):
             if not self.isPlaying:
                 self.player.play()
                 self.isPlaying = True
-                self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/pause.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.playButton.setStyleSheet(pause_btn_css)
 
     # Repeat This button
     def repeatThisMode(self):
@@ -781,241 +750,77 @@ class PlayerWindow(QMainWindow):
 
     def checkstylebuttons(self):
         if self.shuffle:
-            self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
-                                                "border-image: url(img/shuffle_on.png);\n"
-                                                "background: none;\n"
-                                                "border: none;\n"
-                                                "background-repeat: none;")
+            self.ui.shuffleButton.setStyleSheet(shuffle_on_css)
         else:
-            self.ui.shuffleButton.setStyleSheet("background-color: transparent;\n"
-                                                "border-image: url(img/shuffle.png);\n"
-                                                "background: none;\n"
-                                                "border: none;\n"
-                                                "background-repeat: none;")
+            self.ui.shuffleButton.setStyleSheet(shuffle_off_css)
 
         if self.repeatthis and not self.repeatonce:
-            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/repeatthis_on.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+            self.ui.repeatThis.setStyleSheet(repeatthis_on_css)
         elif not self.repeatthis and self.repeatonce:
-            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/repeatonce.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+            self.ui.repeatThis.setStyleSheet(repeatonce_off_css)
         else:
-            self.ui.repeatThis.setStyleSheet("background-color: transparent;\n"
-                                             "border-image: url(img/repeatthis.png);\n"
-                                             "background: none;\n"
-                                             "border: none;\n"
-                                             "background-repeat: none;")
+            self.ui.repeatThis.setStyleSheet(repeatthis_off_css)
 
     def checkStyle(self):
         if self.isEnabled():
             if self.ui.deleteButton.underMouse():
-                self.ui.deleteButton.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/delete_focus.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.deleteButton.setStyleSheet(delete_btn_focus_css)
             else:
-                self.ui.deleteButton.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/delete.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.deleteButton.setStyleSheet(delete_btn_css)
             if self.ui.edit_btn.underMouse():
-                self.ui.edit_btn.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/edit_focus.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.edit_btn.setStyleSheet(edit_btn_focus_css)
             else:
-                self.ui.edit_btn.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/edit.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.edit_btn.setStyleSheet(edit_btn_css)
             if self.ui.aboutButton.underMouse():
-                self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/about_focus.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.aboutButton.setStyleSheet(about_btn_focus_css)
             else:
-                self.ui.aboutButton.setStyleSheet("background-color: transparent;\n"
-                                                  "border-image: url(img/about.png);\n"
-                                                  "background: none;\n"
-                                                  "border: none;\n"
-                                                  "background-repeat: none;")
+                self.ui.aboutButton.setStyleSheet(about_btn_css)
             if self.ui.musicSlider.underMouse():
-                self.ui.musicSlider.setStyleSheet("QSlider{\n"
-                                                  "    background-color: transparent;\n"
-                                                  "}\n"
-                                                  "QSlider::groove:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: transparent;\n"
-                                                  "    height: 3px;\n"
-                                                  "}\n"
-                                                  "QSlider::sub-page:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-                                                  "}\n"
-                                                  "QSlider::add-page:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: rgb(118, 118, 118);\n"
-                                                  "}\n"
-                                                  "QSlider::handle:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: rgb(216, 216, 216);\n"
-                                                  "    width: 14px;\n"
-                                                  "    margin: -5px;\n"
-                                                  "    border-radius: 6px;\n"
-                                                  "}\n"
-                                                  "QSlider::handle:horizontal:hover \n"
-                                                  "{\n"
-                                                  "    background-color: rgb(240, 240, 240);\n"
-                                                  "}")
+                self.ui.musicSlider.setStyleSheet(musicSlider_focus_css)
             else:
-                self.ui.musicSlider.setStyleSheet("QSlider{\n"
-                                                  "    background-color: transparent;\n"
-                                                  "}\n"
-                                                  "QSlider::groove:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: transparent;\n"
-                                                  "    height: 3px;\n"
-                                                  "}\n"
-                                                  "QSlider::sub-page:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-                                                  "}\n"
-                                                  "QSlider::add-page:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: rgb(118, 118, 118);\n"
-                                                  "}\n"
-                                                  "QSlider::handle:horizontal \n"
-                                                  "{\n"
-                                                  "    background-color: transparent;\n"
-                                                  "    width: 14px;\n"
-                                                  "    margin: -5px;\n"
-                                                  "    border-radius: 6px;\n"
-                                                  "}\n"
-                                                  "QSlider::handle:horizontal:hover \n"
-                                                  "{\n"
-                                                  "    background-color: rgb(240, 240, 240);\n"
-                                                  "}")
+                self.ui.musicSlider.setStyleSheet(musicSlider_css)
 
             if self.ui.playButton.underMouse():
                 if not self.isPlaying:
-                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                     "border-image: url(img/play_focus.png);\n"
-                                                     "background: none;\n"
-                                                     "border: none;\n"
-                                                     "background-repeat: none;")
+                    self.ui.playButton.setStyleSheet(play_btn_focus_css)
                 else:
-                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                     "border-image: url(img/pause_focus.png);\n"
-                                                     "background: none;\n"
-                                                     "border: none;\n"
-                                                     "background-repeat: none;")
+                    self.ui.playButton.setStyleSheet(pause_btn_focus_css)
             else:
                 if not self.isPlaying:
-                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                     "border-image: url(img/play.png);\n"
-                                                     "background: none;\n"
-                                                     "border: none;\n"
-                                                     "background-repeat: none;")
+                    self.ui.playButton.setStyleSheet(play_btn_css)
                 else:
-                    self.ui.playButton.setStyleSheet("background-color: transparent;\n"
-                                                     "border-image: url(img/pause.png);\n"
-                                                     "background: none;\n"
-                                                     "border: none;\n"
-                                                     "background-repeat: none;")
+                    self.ui.playButton.setStyleSheet(pause_btn_css)
 
             if self.ui.nextButton.underMouse():
-                self.ui.nextButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/next_focus.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.nextButton.setStyleSheet(next_btn_focus_css)
             else:
-                self.ui.nextButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/next.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.nextButton.setStyleSheet(next_btn_css)
 
             if self.ui.prevButton.underMouse():
-                self.ui.prevButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/prev_focus.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.prevButton.setStyleSheet(prev_btn_focus_css)
             else:
-                self.ui.prevButton.setStyleSheet("background-color: transparent;\n"
-                                                 "border-image: url(img/prev.png);\n"
-                                                 "background: none;\n"
-                                                 "border: none;\n"
-                                                 "background-repeat: none;")
+                self.ui.prevButton.setStyleSheet(prev_btn_css)
 
     def checkstyleVolume(self):
         if self.isEnabled():
             if self.ui.volumeButton.underMouse():
                 if self.ui.volumeSlider.value() == 0:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/mute_focus.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_mute_focus_css)
                 elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/low_focus.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_low_focus_css)
                 elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/medium_focus.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_medium_focus_css)
                 elif self.ui.volumeSlider.value() > 70:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/max_focus.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
-
+                    self.ui.volumeButton.setStyleSheet(volume_max_focus_css)
             else:
                 if self.ui.volumeSlider.value() == 0:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/mute.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_mute_css)
                 elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/low.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_low_css)
                 elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/medium.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
+                    self.ui.volumeButton.setStyleSheet(volume_medium_css)
                 elif self.ui.volumeSlider.value() > 70:
-                    self.ui.volumeButton.setStyleSheet("background-color: transparent;\n"
-                                                       "border-image: url(img/max.png);\n"
-                                                       "background: none;\n"
-                                                       "border: none;\n"
-                                                       "background-repeat: none;")
-
-
-# ----------------------------------------------------------------------------------------------------------------------
+                    self.ui.volumeButton.setStyleSheet(volume_max_css)
 
 if __name__ == "__main__":
     suppress_qt_warnings()
