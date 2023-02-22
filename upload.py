@@ -39,7 +39,8 @@ class UploadWindow(QMainWindow):
         self.ui.selectedFileInfo.setText(file_name)
         self.ui.lineEditName.setText(title)
         self.ui.lineEditArtist.setText(artist)
-        self.ui.coverLabelInfo.setText(cover)
+        self.file_name_final = cover
+        self.ui.coverLabelInfo.setText(self.file_name_final)
         self.show()
 
     def start(self, file_name, song_name, artist, nr_of_files, current_nr, end_nr):
@@ -82,7 +83,9 @@ class UploadWindow(QMainWindow):
             os.makedirs('covers')
         try:
             fname = QFileDialog.getOpenFileName(self, "Open File", "", "Images (*.png *.xpm *.jpg)")
+            not_selected = True
             if fname:
+                not_selected = False
                 self.ui.coverLabelInfo.setText(fname[0])
                 path = fname[0].split("/")
                 file_name = path[-1]
@@ -91,8 +94,10 @@ class UploadWindow(QMainWindow):
                 final = str(self.nr) + "." + str(extension)
                 shutil.copy(fname[0], "./covers/" + final)
         except Exception as e:
+            not_selected = True
             print(e)
-        self.file_name_final = final
+        if not not_selected:
+            self.file_name_final = final
 
     def closeEvent(self, event):
         if self.windowTitle() == "Edit":
