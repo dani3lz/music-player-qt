@@ -1,10 +1,12 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog, \
+    QStyle
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
 from assets.UI.playerUI import Ui_MainWindow
 import upload
 from assets.args import *
 from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
+from PyQt5.QtWinExtras import QWinThumbnailToolBar, QWinThumbnailToolButton
 import os
 import sys
 import json
@@ -152,6 +154,32 @@ class PlayerWindow(QMainWindow):
         self.tray_icon.activated.connect(self.systemIcon)
         self.tray_icon.show()
 
+        # Toolbar
+        self.toolBar = QWinThumbnailToolBar(self)
+
+        self.toolBtnPrev = QWinThumbnailToolButton(self.toolBar)
+        self.toolBtnPrev.setToolTip('Prev')
+        self.toolBtnPrev.setIcon(self.style().standardIcon(QStyle.SP_MediaSkipBackward))
+        self.toolBtnPrev.clicked.connect(self.prev)
+        self.toolBar.addButton(self.toolBtnPrev)
+
+        self.toolBtnControl = QWinThumbnailToolButton(self.toolBar)
+        self.toolBtnControl.setToolTip('Play')
+        self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+        self.toolBtnControl.clicked.connect(self.play)
+        self.toolBar.addButton(self.toolBtnControl)
+
+        self.toolBtnNext = QWinThumbnailToolButton(self.toolBar)
+        self.toolBtnNext.setToolTip('Next')
+        self.toolBtnNext.setIcon(self.style().standardIcon(QStyle.SP_MediaSkipForward))
+        self.toolBtnNext.clicked.connect(self.next)
+        self.toolBar.addButton(self.toolBtnNext)
+
+    def showEvent(self, event):
+        super(PlayerWindow, self).showEvent(event)
+        if not self.toolBar.window():
+            self.toolBar.setWindow(self.windowHandle())
+
 
     # read songs from songs.json
     def read_songs_from_json(self):
@@ -254,7 +282,9 @@ class PlayerWindow(QMainWindow):
         nr_of_files = len(os.listdir("songs"))
         try:
             fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
+            not_selected = True
             if not len(fname[0]) == 0:
+                not_selected = False
                 self.setWindowTitle(name_window + " | Uploading... 0%")
                 self.ui.titleBarInfoLabel.setText("Uploading... 0%")
                 QApplication.processEvents()
@@ -328,6 +358,7 @@ class PlayerWindow(QMainWindow):
                 completed = True
         except Exception as e:
             completed = False
+            not_selected = True
             print(e)
         if completed:
             upload.skip_clicked = False
@@ -335,9 +366,10 @@ class PlayerWindow(QMainWindow):
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(songs_list, file, indent=4)
             self.read_songs_from_json()
-        self.isPlaying = False
-        self.setWindowTitle(name_window)
-        self.ui.titleBarInfoLabel.setText("")
+        if not not_selected:
+            self.isPlaying = False
+            self.setWindowTitle(name_window)
+            self.ui.titleBarInfoLabel.setText("")
         self.timer.start()
         window.setEnabled(True)
 
@@ -681,11 +713,15 @@ class PlayerWindow(QMainWindow):
             if not self.isPlaying:
                 self.player.play()
                 self.isPlaying = True
+                self.toolBtnControl.setToolTip('Pause')
+                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
                 self.newIndex = self.player.playlist().currentIndex()
                 self.checkStyle()
             else:
                 self.player.pause()
                 self.isPlaying = False
+                self.toolBtnControl.setToolTip('Play')
+                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
                 self.checkStyle()
 
     # Next button
