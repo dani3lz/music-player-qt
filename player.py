@@ -98,8 +98,10 @@ class PlayerWindow(QMainWindow):
         self.ui.listWidget.itemClicked.connect(self.changeSong)
 
         # Volume slider bar connect
+        self.ui.volumeSlider.setMaximum(100)
+        self.ui.volumeSlider.setMinimum(0)
         self.ui.volumeSlider.setValue(self.volume)
-        self.ui.volumeSlider.actionTriggered.connect(self.setVolume)
+        self.ui.volumeSlider.valueChanged.connect(self.setVolume)
 
         # Setup timer
         self.timer = QTimer(self)
@@ -577,8 +579,8 @@ class PlayerWindow(QMainWindow):
                 self.ui.volumeSlider.setValue(self.volume)
                 self.player.setVolume(self.volume)
             else:
-                self.ui.volumeSlider.setValue(75)
-                self.player.setVolume(75)
+                self.ui.volumeSlider.setValue(50)
+                self.player.setVolume(50)
 
     # Convert duration of song to minutes and seconds
     def convertMillis(self, millis):
@@ -733,6 +735,7 @@ class PlayerWindow(QMainWindow):
                 self.player.play()
                 self.isPlaying = True
                 self.ui.playButton.setStyleSheet(pause_btn_css)
+                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
 
     # Previous button
     def prev(self):
@@ -746,6 +749,7 @@ class PlayerWindow(QMainWindow):
                 self.player.play()
                 self.isPlaying = True
                 self.ui.playButton.setStyleSheet(pause_btn_css)
+                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
 
     # Repeat This button
     def repeatThisMode(self):
