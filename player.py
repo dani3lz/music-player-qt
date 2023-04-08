@@ -20,6 +20,14 @@ def suppress_qt_warnings():
     os.environ["QT_SCALE_FACTOR"] = "1"
 
 
+def open_github():
+    try:
+        url = QUrl("https://github.com/dani3lz/Music_Player")
+        QDesktopServices.openUrl(url)
+    except Exception as e:
+        print(e)
+
+
 class PlayerWindow(QMainWindow):
     def __init__(self):
         super(PlayerWindow, self).__init__()
@@ -39,7 +47,7 @@ class PlayerWindow(QMainWindow):
         self.artists = []
         self.covers = []
         self.shuffle = False
-        self.repeatthis = False
+        self.repeat_this = False
         self.repeatonce = False
         self.changeMode = False
         self.mode = "Normal"
@@ -50,7 +58,7 @@ class PlayerWindow(QMainWindow):
         self.row = 0
         self.read_songs_from_json()
         self.settings_read()
-        self.checkCover()
+        self.check_cover()
 
         # Setup elements Nr.2
         self.isPlaying = False
@@ -82,26 +90,26 @@ class PlayerWindow(QMainWindow):
         self.ui.playButton.clicked.connect(self.play)
         self.ui.nextButton.clicked.connect(self.next)
         self.ui.prevButton.clicked.connect(self.prev)
-        self.ui.shuffleButton.clicked.connect(self.shuffleMode)
-        self.ui.repeatThis.clicked.connect(self.repeatThisMode)
+        self.ui.shuffleButton.clicked.connect(self.shuffle_btn)
+        self.ui.repeatThis.clicked.connect(self.repeat_this_btn)
         self.ui.uploadButton.clicked.connect(self.upload_btn)
         self.ui.playButton.setIcon(QIcon("play.png"))
         self.ui.volumeButton.clicked.connect(self.mute)
         self.ui.edit_btn.clicked.connect(self.edit_btn)
         self.ui.deleteButton.clicked.connect(self.delete_btn)
-        self.ui.aboutButton.clicked.connect(self.aboutButton)
+        self.ui.aboutButton.clicked.connect(self.about_button)
         self.ui.closeButton.clicked.connect(self.closeButton_clicked)
         self.ui.minimizeButton.clicked.connect(self.minimizeButton_clicked)
 
         # Music slider bar connect
-        self.ui.musicSlider.sliderReleased.connect(self.sliderValue)
-        self.ui.listWidget.itemClicked.connect(self.changeSong)
+        self.ui.musicSlider.sliderReleased.connect(self.slider_value)
+        self.ui.listWidget.itemClicked.connect(self.change_song)
 
         # Volume slider bar connect
         self.ui.volumeSlider.setMaximum(100)
         self.ui.volumeSlider.setMinimum(0)
         self.ui.volumeSlider.setValue(self.volume)
-        self.ui.volumeSlider.valueChanged.connect(self.setVolume)
+        self.ui.volumeSlider.valueChanged.connect(self.set_volume)
 
         # Setup timer
         self.timer = QTimer(self)
@@ -115,12 +123,12 @@ class PlayerWindow(QMainWindow):
             print(e)
 
         # Check mode
-        self.checkMode()
+        self.check_mode()
         if os.path.exists('songs'):
             self.read_files_songs()
-            self.checkstylebuttons()
+            self.check_style_mode()
         else:
-            self.checkstylebuttons()
+            self.check_style_mode()
 
         # Set color if exist first song
         if first_song:
@@ -139,8 +147,8 @@ class PlayerWindow(QMainWindow):
         about_action = QAction("About", self)
         exit_action = QAction("Exit", self)
         show_action.triggered.connect(self.open_tray_button)
-        github_action.triggered.connect(self.open_github)
-        about_action.triggered.connect(self.aboutButton)
+        github_action.triggered.connect(open_github)
+        about_action.triggered.connect(self.about_button)
         exit_action.triggered.connect(qApp.quit)
 
         tray_menu = QMenu()
@@ -153,7 +161,7 @@ class PlayerWindow(QMainWindow):
         tray_menu.addAction(exit_action)
 
         self.tray_icon.setContextMenu(tray_menu)
-        self.tray_icon.activated.connect(self.systemIcon)
+        self.tray_icon.activated.connect(self.system_icon)
         self.tray_icon.show()
 
         # Toolbar
@@ -177,11 +185,22 @@ class PlayerWindow(QMainWindow):
         self.toolBtnNext.clicked.connect(self.next)
         self.toolBar.addButton(self.toolBtnNext)
 
+    def check_toolbar_button(self):
+        if self.isPlaying:
+            self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
+        else:
+            self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+
+    def app_setEnabled(self, b):
+            window.setEnabled(b)
+            self.toolBtnControl.blockSignals(not b)
+            self.toolBtnNext.blockSignals(not b)
+            self.toolBtnPrev.blockSignals(not b)
+
     def showEvent(self, event):
         super(PlayerWindow, self).showEvent(event)
         if not self.toolBar.window():
             self.toolBar.setWindow(self.windowHandle())
-
 
     # read songs from songs.json
     def read_songs_from_json(self):
@@ -246,7 +265,7 @@ class PlayerWindow(QMainWindow):
             except Exception as e:
                 print(e)
 
-        self.checkCover()
+        self.check_cover()
 
         try:
             self.player.setVolume(self.volume)
@@ -276,9 +295,8 @@ class PlayerWindow(QMainWindow):
             with open("songs.json", "r", encoding="utf-8") as file:
                 songs_list = json.load(file)
         except:
-            songs_list = {}
-            songs_list["Songs"] = []
-        window.setEnabled(False)
+            songs_list = {"Songs": []}
+        self.app_setEnabled(False)
         if not os.path.exists('songs'):
             os.makedirs('songs')
         nr_of_files = len(os.listdir("songs"))
@@ -373,7 +391,7 @@ class PlayerWindow(QMainWindow):
             self.setWindowTitle(name_window)
             self.ui.titleBarInfoLabel.setText("")
         self.timer.start()
-        window.setEnabled(True)
+        self.app_setEnabled(True)
 
     # Delete button
     def delete_btn(self):
@@ -388,8 +406,7 @@ class PlayerWindow(QMainWindow):
 
         if open_file:
             last_id = 0
-            songs_list_new = {}
-            songs_list_new["Songs"] = []
+            songs_list_new = {"Songs": []}
 
             for song in songs_list["Songs"]:
                 if song["id"] == id_selected:
@@ -427,7 +444,7 @@ class PlayerWindow(QMainWindow):
     # Edit button
     def edit_btn(self):
         self.timer.stop()
-        self.setEnabled(False)
+        self.app_setEnabled(False)
         cancel_edit = False
         id_selected = self.row
         try:
@@ -439,8 +456,7 @@ class PlayerWindow(QMainWindow):
             open_file = False
 
         if open_file:
-            songs_list_new = {}
-            songs_list_new["Songs"] = []
+            songs_list_new = {"Songs": []}
 
             for song in songs_list["Songs"]:
                 if song["id"] == id_selected:
@@ -494,11 +510,8 @@ class PlayerWindow(QMainWindow):
                     json.dump(songs_list_new, file, indent=4)
                 self.isPlaying = False
                 self.read_songs_from_json()
-                self.timer.start()
-                window.setEnabled(True)
-            else:
-                self.timer.start()
-                window.setEnabled(True)
+            self.timer.start()
+            self.app_setEnabled(True)
 
     # Tray menu
     def open_tray_button(self):
@@ -507,14 +520,7 @@ class PlayerWindow(QMainWindow):
         else:
             self.activateWindow()
 
-    def open_github(self):
-        try:
-            url = QUrl("https://github.com/dani3lz/Music_Player")
-            QDesktopServices.openUrl(url)
-        except Exception as e:
-            print(e)
-
-    def systemIcon(self, reason):
+    def system_icon(self, reason):
         if reason == QSystemTrayIcon.Trigger:
             if self.windowState() == Qt.WindowMinimized:
                 self.setWindowState(Qt.WindowNoState)
@@ -555,7 +561,7 @@ class PlayerWindow(QMainWindow):
         self.hide()
 
     # Function for About button
-    def aboutButton(self):
+    def about_button(self):
         try:
             self.show()
             self.msg_about = QMessageBox()
@@ -583,18 +589,18 @@ class PlayerWindow(QMainWindow):
                 self.player.setVolume(50)
 
     # Convert duration of song to minutes and seconds
-    def convertMillis(self, millis):
+    def convert_millis_to_seconds(self, millis):
         seconds = (millis / 1000) % 60
         minutes = (millis / (1000 * 60)) % 60
         return minutes, seconds
 
     # Volume slider
-    def setVolume(self):
+    def set_volume(self):
         self.volume = self.ui.volumeSlider.value()
         self.player.setVolume(self.volume)
 
     # Change music using the list
-    def changeSong(self):
+    def change_song(self):
         self.row = self.ui.listWidget.currentRow()
         self.player.playlist().setCurrentIndex(self.row)
         if not self.isPlaying:
@@ -603,7 +609,7 @@ class PlayerWindow(QMainWindow):
             self.isPlaying = True
 
     # Music slider
-    def sliderValue(self):
+    def slider_value(self):
         self.player.setPosition(self.ui.musicSlider.value())
 
     # Read information about player
@@ -621,19 +627,18 @@ class PlayerWindow(QMainWindow):
             print(e)
 
     # Check player mode
-    def checkMode(self):
+    def check_mode(self):
         if self.mode == "Shuffle":
-            self.shuffleMode()
+            self.shuffle_btn()
         elif self.mode == "Repeat This":
-            self.repeatThisMode()
+            self.repeat_this_btn()
         elif self.mode == "Repeat Once":
-            self.repeatthis = True
-            self.repeatThisMode()
+            self.repeat_this = True
+            self.repeat_this_btn()
 
     # Write current information about player
     def settings_write(self):
-        settings_list = {}
-        settings_list["Settings"] = []
+        settings_list = {"Settings": []}
         settings_list["Settings"].append({
             "Volume": self.volume,
             "Row": self.row,
@@ -642,40 +647,45 @@ class PlayerWindow(QMainWindow):
         with open("settings.json", "w", encoding="utf-8") as f:
             json.dump(settings_list, f, indent=4)
 
+    def update_duration_of_music(self):
+        song_min, song_sec = self.convert_millis_to_seconds(int(self.player.duration()))
+        if song_sec < 10:
+            self.song_duration = "{0}:0{1}".format(int(song_min), int(song_sec))
+        else:
+            self.song_duration = "{0}:{1}".format(int(song_min), int(song_sec))
+
+        now_min, self.now_sec = self.convert_millis_to_seconds(int(self.ui.musicSlider.value()))
+        if self.now_sec < 10:
+            self.now_duration = "{0}:0{1}".format(int(now_min), int(self.now_sec))
+        else:
+            self.now_duration = "{0}:{1}".format(int(now_min), int(self.now_sec))
+
+        self.ui.durationLabel.setText(str(self.now_duration) + " / " + str(self.song_duration))
+
+    def check_repeat_once(self):
+        if self.repeatonce:
+            if self.now_duration == self.song_duration:
+                self.isPlaying = False
+                self.ui.playButton.setStyleSheet(play_btn_css)
+                self.player.stop()
+
     # Timer
     def time_hit(self):
-        self.checkStyle()
-        self.checkstyleVolume()
+        self.check_style_buttons()
+        self.check_style_volume()
+        self.check_toolbar_button()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
                 self.ui.musicSlider.setValue(self.player.position())
             self.newIndex = self.player.playlist().currentIndex()
-            self.checkList()
-
-            song_min, song_sec = self.convertMillis(int(self.player.duration()))
-            if song_sec < 10:
-                self.song_duration = "{0}:0{1}".format(int(song_min), int(song_sec))
-            else:
-                self.song_duration = "{0}:{1}".format(int(song_min), int(song_sec))
-
-            now_min, self.now_sec = self.convertMillis(int(self.ui.musicSlider.value()))
-            if self.now_sec < 10:
-                self.now_duration = "{0}:0{1}".format(int(now_min), int(self.now_sec))
-            else:
-                self.now_duration = "{0}:{1}".format(int(now_min), int(self.now_sec))
-
-            self.ui.durationLabel.setText(str(self.now_duration) + " / " + str(self.song_duration))
-
-            if self.repeatonce:
-                if self.now_duration == self.song_duration:
-                    self.isPlaying = False
-                    self.ui.playButton.setStyleSheet(play_btn_css)
-                    self.player.stop()
+            self.check_list()
+            self.update_duration_of_music()
+            self.check_repeat_once()
         self.settings_write()
 
     # Check cover image
-    def checkCover(self):
+    def check_cover(self):
         try:
             if self.covers[self.currentIndex] == "no_image.jpg":
                 self.imgsrc = QPixmap("assets/img/" + self.covers[self.currentIndex])
@@ -688,7 +698,7 @@ class PlayerWindow(QMainWindow):
             print(e)
 
     # Sets the current position in the list
-    def checkList(self):
+    def check_list(self):
         try:
             if self.currentIndex == self.newIndex:
                 pass
@@ -705,7 +715,7 @@ class PlayerWindow(QMainWindow):
                 self.ui.listWidget.setCurrentRow(self.player.playlist().currentIndex())
                 self.currentIndex = self.newIndex
                 self.row = self.newIndex
-                self.checkCover()
+                self.check_cover()
         except Exception as e:
             print(e)
 
@@ -716,15 +726,13 @@ class PlayerWindow(QMainWindow):
                 self.player.play()
                 self.isPlaying = True
                 self.toolBtnControl.setToolTip('Pause')
-                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
                 self.newIndex = self.player.playlist().currentIndex()
-                self.checkStyle()
+                self.check_style_buttons()
             else:
                 self.player.pause()
                 self.isPlaying = False
                 self.toolBtnControl.setToolTip('Play')
-                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-                self.checkStyle()
+                self.check_style_buttons()
 
     # Next button
     def next(self):
@@ -735,12 +743,11 @@ class PlayerWindow(QMainWindow):
                 self.player.play()
                 self.isPlaying = True
                 self.ui.playButton.setStyleSheet(pause_btn_css)
-                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
 
     # Previous button
     def prev(self):
         if len(self.titles) > 0:
-            if int(self.now_sec) < 10:
+            if int(self.now_sec) < 5:
                 self.playlist.previous()
                 self.newIndex = self.player.playlist().currentIndex()
             else:
@@ -749,59 +756,58 @@ class PlayerWindow(QMainWindow):
                 self.player.play()
                 self.isPlaying = True
                 self.ui.playButton.setStyleSheet(pause_btn_css)
-                self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
 
     # Repeat This button
-    def repeatThisMode(self):
-        if not self.repeatthis and not self.repeatonce:
+    def repeat_this_btn(self):
+        if not self.repeat_this and not self.repeatonce:
             self.playlist.setPlaybackMode(1)
-            self.repeatthis = True
+            self.repeat_this = True
             self.shuffle = False
             self.repeatonce = False
             self.mode = "Repeat This"
-            self.checkstylebuttons()
-        elif self.repeatthis:
+            self.check_style_mode()
+        elif self.repeat_this:
             self.playlist.setPlaybackMode(0)
-            self.repeatthis = False
+            self.repeat_this = False
             self.shuffle = False
             self.repeatonce = True
             self.mode = "Repeat Once"
-            self.checkstylebuttons()
+            self.check_style_mode()
         else:
             self.playlist.setPlaybackMode(3)
             self.repeatonce = False
             self.mode = "Normal"
-            self.checkstylebuttons()
+            self.check_style_mode()
 
     # Shuffle button
-    def shuffleMode(self):
+    def shuffle_btn(self):
         if not self.shuffle:
             self.playlist.setPlaybackMode(4)
             self.shuffle = True
             self.repeatonce = False
-            self.repeatthis = False
+            self.repeat_this = False
             self.mode = "Shuffle"
-            self.checkstylebuttons()
+            self.check_style_mode()
         else:
             self.playlist.setPlaybackMode(3)
             self.shuffle = False
             self.mode = "Normal"
-            self.checkstylebuttons()
+            self.check_style_mode()
 
-    def checkstylebuttons(self):
+    def check_style_mode(self):
         if self.shuffle:
             self.ui.shuffleButton.setStyleSheet(shuffle_on_css)
         else:
             self.ui.shuffleButton.setStyleSheet(shuffle_off_css)
 
-        if self.repeatthis and not self.repeatonce:
+        if self.repeat_this and not self.repeatonce:
             self.ui.repeatThis.setStyleSheet(repeatthis_on_css)
-        elif not self.repeatthis and self.repeatonce:
+        elif not self.repeat_this and self.repeatonce:
             self.ui.repeatThis.setStyleSheet(repeatonce_off_css)
         else:
             self.ui.repeatThis.setStyleSheet(repeatthis_off_css)
 
-    def checkStyle(self):
+    def check_style_buttons(self):
         if self.isEnabled():
             if self.ui.deleteButton.underMouse():
                 self.ui.deleteButton.setStyleSheet(delete_btn_focus_css)
@@ -841,23 +847,23 @@ class PlayerWindow(QMainWindow):
             else:
                 self.ui.prevButton.setStyleSheet(prev_btn_css)
 
-    def checkstyleVolume(self):
+    def check_style_volume(self):
         if self.isEnabled():
             if self.ui.volumeButton.underMouse():
                 if self.ui.volumeSlider.value() == 0:
                     self.ui.volumeButton.setStyleSheet(volume_mute_focus_css)
-                elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
+                elif 0 < self.ui.volumeSlider.value() <= 30:
                     self.ui.volumeButton.setStyleSheet(volume_low_focus_css)
-                elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
+                elif 30 < self.ui.volumeSlider.value() <= 70:
                     self.ui.volumeButton.setStyleSheet(volume_medium_focus_css)
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet(volume_max_focus_css)
             else:
                 if self.ui.volumeSlider.value() == 0:
                     self.ui.volumeButton.setStyleSheet(volume_mute_css)
-                elif self.ui.volumeSlider.value() > 0 and self.ui.volumeSlider.value() <= 30:
+                elif 0 < self.ui.volumeSlider.value() <= 30:
                     self.ui.volumeButton.setStyleSheet(volume_low_css)
-                elif self.ui.volumeSlider.value() > 30 and self.ui.volumeSlider.value() <= 70:
+                elif 30 < self.ui.volumeSlider.value() <= 70:
                     self.ui.volumeButton.setStyleSheet(volume_medium_css)
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet(volume_max_css)
