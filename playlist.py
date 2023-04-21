@@ -1,6 +1,6 @@
 import json
 
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QAbstractItemView
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from assets.UI.playlistUI import Ui_Dialog
@@ -35,10 +35,25 @@ class PlaylistWindow(QMainWindow):
         self.ui.tableWidget.itemClicked.connect(self.item_check)
         self.ui.buttonBox.accepted.connect(self.save_playlist)
         self.ui.buttonBox.rejected.connect(self.cancel_action)
-        self.errorMessage = None
-
+        self.ui.selectButton.clicked.connect(self.select_all)
+        self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.ui.tableWidget.setFocusPolicy(Qt.NoFocus)
+        self.ui.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
         self.init_table()
         self.cancel = False
+
+    def select_all(self):
+        count = self.ui.tableWidget.rowCount()
+        nr = 0
+        for i in range(count):
+            if self.ui.tableWidget.item(i, 0).checkState() == Qt.CheckState.Checked:
+                nr += 1
+        if count == nr:
+            for i in range(count):
+                self.ui.tableWidget.item(i, 0).setCheckState(Qt.CheckState.Unchecked)
+        else:
+            for i in range(count):
+                self.ui.tableWidget.item(i, 0).setCheckState(Qt.CheckState.Checked)
 
     def item_check(self):
         if self.ui.tableWidget.currentItem() is not None:
@@ -99,4 +114,3 @@ class PlaylistWindow(QMainWindow):
     def cancel_action(self):
         self.cancel = True
         self.hide()
-
