@@ -67,7 +67,8 @@ class PlayerWindow(QMainWindow):
         self.newIndex = -1
         self.playlist.setPlaybackMode(3)
         self.ui.listWidget.setCurrentRow(0)
-        self.ui.imgLabel.setPixmap(QPixmap("assets/img/no_image.jpg").scaled(self.ui.imgLabel.width(), self.ui.imgLabel.width()))
+        self.ui.imgLabel.setPixmap(
+            QPixmap("assets/img/no_image.jpg").scaled(self.ui.imgLabel.width(), self.ui.imgLabel.width()))
 
         # Check if exist first song in file
         try:
@@ -192,10 +193,10 @@ class PlayerWindow(QMainWindow):
             self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
 
     def app_setEnabled(self, b):
-            window.setEnabled(b)
-            self.toolBtnControl.blockSignals(not b)
-            self.toolBtnNext.blockSignals(not b)
-            self.toolBtnPrev.blockSignals(not b)
+        window.setEnabled(b)
+        self.toolBtnControl.blockSignals(not b)
+        self.toolBtnNext.blockSignals(not b)
+        self.toolBtnPrev.blockSignals(not b)
 
     def showEvent(self, event):
         super(PlayerWindow, self).showEvent(event)
@@ -371,7 +372,8 @@ class PlayerWindow(QMainWindow):
                         "id": nr_of_files,
                         "title": song_name,
                         "artist": artist,
-                        "cover": upload.file_name_final
+                        "cover": upload.file_name_final,
+                        "playlist": "Undefined"
                     })
 
                     nr_of_files += 1
@@ -424,14 +426,16 @@ class PlayerWindow(QMainWindow):
                             "id": last_id,
                             "title": song["title"],
                             "artist": song["artist"],
-                            "cover": cover_new_name
+                            "cover": cover_new_name,
+                            "playlist": "Undefined"
                         })
                     else:
                         songs_list_new["Songs"].append({
                             "id": last_id,
                             "title": song["title"],
                             "artist": song["artist"],
-                            "cover": song["cover"]
+                            "cover": song["cover"],
+                            "playlist": "Undefined"
                         })
 
                     last_id += 1
@@ -471,10 +475,10 @@ class PlayerWindow(QMainWindow):
                             "id": song["id"],
                             "title": song["title"],
                             "artist": song["artist"],
-                            "cover": song["cover"]
+                            "cover": song["cover"],
+                            "playlist": "Undefined"
                         })
                     else:
-
                         if str(upload.ui.lineEditName.text()) == "":
                             song_name = "Undefined"
                         else:
@@ -484,12 +488,12 @@ class PlayerWindow(QMainWindow):
                             artist = "Undefined"
                         else:
                             artist = str(upload.ui.lineEditArtist.text())
-
                         songs_list_new["Songs"].append({
                             "id": song["id"],
                             "title": song_name,
                             "artist": artist,
-                            "cover": upload.file_name_final
+                            "cover": upload.file_name_final,
+                            "playlist": "Undefined"
                         })
 
                     upload.ui.lineEditName.clear()
@@ -502,7 +506,8 @@ class PlayerWindow(QMainWindow):
                         "id": song["id"],
                         "title": song["title"],
                         "artist": song["artist"],
-                        "cover": song["cover"]
+                        "cover": song["cover"],
+                        "playlist": "Undefined"
                     })
 
             if not cancel_edit:
@@ -809,6 +814,10 @@ class PlayerWindow(QMainWindow):
 
     def check_style_buttons(self):
         if self.isEnabled():
+            if self.ui.dropListGear.underMouse():
+                self.ui.dropListGear.setStyleSheet(gear_focus_css)
+            else:
+                self.ui.dropListGear.setStyleSheet(gear_css)
             if self.ui.deleteButton.underMouse():
                 self.ui.deleteButton.setStyleSheet(delete_btn_focus_css)
             else:
@@ -867,6 +876,7 @@ class PlayerWindow(QMainWindow):
                     self.ui.volumeButton.setStyleSheet(volume_medium_css)
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet(volume_max_css)
+
 
 if __name__ == "__main__":
     suppress_qt_warnings()

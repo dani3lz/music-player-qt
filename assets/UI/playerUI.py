@@ -14,7 +14,7 @@ class Ui_MainWindow(object):
         self.titleBarLabel = QtWidgets.QLabel(self.centralwidget)
         self.titleBarLabel.setGeometry(QtCore.QRect(0, 0, 963, 30))
         self.titleBarLabel.setStyleSheet("background: #070707;\n"
-                                      "color: #CDCDCD;")
+                                         "color: #CDCDCD;")
         self.titleBarLabel.setText("")
         self.titleBarLabel.setObjectName("titleBarLabel")
 
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.titleBarInfoLabel.setFont(font)
         self.titleBarInfoLabel.setStyleSheet("background: transparent;\n"
-                                         "color: #CDCDCD;")
+                                             "color: #CDCDCD;")
         self.titleBarInfoLabel.setText("")
         self.titleBarInfoLabel.setObjectName("titleBarInfoLabel")
 
@@ -45,29 +45,27 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.closeButton.setFont(font)
         self.closeButton.setStyleSheet("QPushButton\n"
-"{\n"
-"    background: #070707;\n"
-"    color: #cdcdcd;\n"
-"    border-style: solid;\n"
-"    border-width: 1px;\n"
-"    border-color: transparent;\n"
-"}\n"
-"\n"
-"QPushButton::hover\n"
-"{\n"
-"    background-color: #E81123;\n"
-"    color: #fff;\n"
-"}\n"
-"\n"
-"\n"
-"QPushButton::pressed\n"
-"{\n"
-"    background-color: #7D0913;\n"
-"    color: #fff;\n"
-"}")
+                                       "{\n"
+                                       "    background: #070707;\n"
+                                       "    color: #cdcdcd;\n"
+                                       "    border-style: solid;\n"
+                                       "    border-width: 1px;\n"
+                                       "    border-color: transparent;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QPushButton::hover\n"
+                                       "{\n"
+                                       "    background-color: #E81123;\n"
+                                       "    color: #fff;\n"
+                                       "}\n"
+                                       "\n"
+                                       "\n"
+                                       "QPushButton::pressed\n"
+                                       "{\n"
+                                       "    background-color: #7D0913;\n"
+                                       "    color: #fff;\n"
+                                       "}")
         self.closeButton.setObjectName("closeButton")
-
-
 
         self.minimizeButton = QtWidgets.QPushButton(MainWindow)
         self.minimizeButton.setGeometry(QtCore.QRect(963, 0, 44, 30))
@@ -75,28 +73,27 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         self.minimizeButton.setFont(font)
         self.minimizeButton.setStyleSheet("QPushButton\n"
-"{\n"
-"    background: #070707;\n"
-"    color: #cdcdcd;\n"
-"    border-style: solid;\n"
-"    border-width: 1px;\n"
-"    border-color: transparent;\n"
-"}\n"
-"\n"
-"QPushButton::hover\n"
-"{\n"
-"    background-color: #0F0F0F;\n"
-"    color: #fff;\n"
-"}\n"
-"\n"
-"\n"
-"QPushButton::pressed\n"
-"{\n"
-"    background-color: #4A4A4A;\n"
-"    color: #fff;\n"
-"}")
+                                          "{\n"
+                                          "    background: #070707;\n"
+                                          "    color: #cdcdcd;\n"
+                                          "    border-style: solid;\n"
+                                          "    border-width: 1px;\n"
+                                          "    border-color: transparent;\n"
+                                          "}\n"
+                                          "\n"
+                                          "QPushButton::hover\n"
+                                          "{\n"
+                                          "    background-color: #0F0F0F;\n"
+                                          "    color: #fff;\n"
+                                          "}\n"
+                                          "\n"
+                                          "\n"
+                                          "QPushButton::pressed\n"
+                                          "{\n"
+                                          "    background-color: #4A4A4A;\n"
+                                          "    color: #fff;\n"
+                                          "}")
         self.minimizeButton.setObjectName("minimizeButton")
-
 
         self.titleLabel = QtWidgets.QLabel(self.centralwidget)
         self.titleLabel.setGeometry(QtCore.QRect(270, 49, 501, 21))
@@ -104,22 +101,23 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.titleLabel.setFont(font)
         self.titleLabel.setStyleSheet("background: none;\n"
-"color: white;")
+                                      "color: white;")
         self.titleLabel.setText("")
         self.titleLabel.setObjectName("titleLabel")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(-10, 30, 1071, 641))
-        self.groupBox.setStyleSheet("background: qlineargradient(spread:pad, x1:1, y1:0, x2:1, y2:1, stop:0 rgba(65, 65, 65, 255), stop:1 rgba(0, 0, 0, 255));\n"
-"border: none;")
+        self.groupBox.setStyleSheet(
+            "background: qlineargradient(spread:pad, x1:1, y1:0, x2:1, y2:1, stop:0 rgba(65, 65, 65, 255), stop:1 rgba(0, 0, 0, 255));\n"
+            "border: none;")
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.prevButton = QtWidgets.QPushButton(self.groupBox)
         self.prevButton.setGeometry(QtCore.QRect(175, 60, 31, 31))
         self.prevButton.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/prev.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                      "border-image: url(img/prev.png);\n"
+                                      "background: none;\n"
+                                      "border: none;\n"
+                                      "background-repeat: none;")
         self.prevButton.setText("")
         self.prevButton.setObjectName("prevButton")
         self.durationLabel = QtWidgets.QLabel(self.groupBox)
@@ -128,7 +126,7 @@ class Ui_MainWindow(object):
         font.setPointSize(8)
         self.durationLabel.setFont(font)
         self.durationLabel.setStyleSheet("color: white;\n"
-"background: none;")
+                                         "background: none;")
         self.durationLabel.setObjectName("durationLabel")
         self.playButton = QtWidgets.QPushButton(self.groupBox)
         self.playButton.setGeometry(QtCore.QRect(85, 40, 71, 71))
@@ -140,69 +138,69 @@ class Ui_MainWindow(object):
         font.setStrikeOut(False)
         self.playButton.setFont(font)
         self.playButton.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/play.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                      "border-image: url(img/play.png);\n"
+                                      "background: none;\n"
+                                      "border: none;\n"
+                                      "background-repeat: none;")
         self.playButton.setText("")
         self.playButton.setObjectName("playButton")
         self.nextButton = QtWidgets.QPushButton(self.groupBox)
         self.nextButton.setGeometry(QtCore.QRect(225, 60, 31, 31))
         self.nextButton.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/next.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                      "border-image: url(img/next.png);\n"
+                                      "background: none;\n"
+                                      "border: none;\n"
+                                      "background-repeat: none;")
         self.nextButton.setText("")
         self.nextButton.setObjectName("nextButton")
         self.volumeSlider = QtWidgets.QSlider(self.groupBox)
         self.volumeSlider.setGeometry(QtCore.QRect(899, 64, 131, 22))
         self.volumeSlider.setStyleSheet("QSlider{\n"
-"    background-color: transparent;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::groove:horizontal \n"
-"{\n"
-"    background-color: transparent;\n"
-"    height: 3px;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::sub-page:horizontal \n"
-"{\n"
-"    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::add-page:horizontal \n"
-"{\n"
-"    background-color: rgb(118, 118, 118);\n"
-"\n"
-"\n"
-";\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::handle:horizontal \n"
-"{\n"
-"    background-color: rgb(216, 216, 216);\n"
-"    width: 14px;\n"
-"    margin: -5px;\n"
-"    border-radius: 6px;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::handle:horizontal:hover \n"
-"{\n"
-"    background-color: rgb(240, 240, 240);\n"
-"\n"
-"}")
+                                        "    background-color: transparent;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QSlider::groove:horizontal \n"
+                                        "{\n"
+                                        "    background-color: transparent;\n"
+                                        "    height: 3px;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QSlider::sub-page:horizontal \n"
+                                        "{\n"
+                                        "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QSlider::add-page:horizontal \n"
+                                        "{\n"
+                                        "    background-color: rgb(118, 118, 118);\n"
+                                        "\n"
+                                        "\n"
+                                        ";\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QSlider::handle:horizontal \n"
+                                        "{\n"
+                                        "    background-color: rgb(216, 216, 216);\n"
+                                        "    width: 14px;\n"
+                                        "    margin: -5px;\n"
+                                        "    border-radius: 6px;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QSlider::handle:horizontal:hover \n"
+                                        "{\n"
+                                        "    background-color: rgb(240, 240, 240);\n"
+                                        "\n"
+                                        "}")
         self.volumeSlider.setMinimum(0)
         self.volumeSlider.setMaximum(100)
         self.volumeSlider.setSingleStep(2)
@@ -215,47 +213,47 @@ class Ui_MainWindow(object):
         self.musicSlider.setGeometry(QtCore.QRect(280, 60, 501, 31))
         self.musicSlider.setFocusPolicy(QtCore.Qt.NoFocus)
         self.musicSlider.setStyleSheet("QSlider{\n"
-"    background-color: transparent;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::groove:horizontal \n"
-"{\n"
-"    background-color: transparent;\n"
-"    height: 3px;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::sub-page:horizontal \n"
-"{\n"
-"    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
-"\n"
-"}\n"
-"\n"
-"QSlider::add-page:horizontal \n"
-"{\n"
-"    background-color: rgb(118, 118, 118);\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::handle:horizontal \n"
-"{\n"
-"    background-color: transparent;\n"
-"    width: 14px;\n"
-"    margin: -5px;\n"
-"    border-radius: 6px;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QSlider::handle:horizontal:hover \n"
-"{\n"
-"    background-color: rgb(240, 240, 240);\n"
-"\n"
-"}")
+                                       "    background-color: transparent;\n"
+                                       "\n"
+                                       "}\n"
+                                       "\n"
+                                       "\n"
+                                       "QSlider::groove:horizontal \n"
+                                       "{\n"
+                                       "    background-color: transparent;\n"
+                                       "    height: 3px;\n"
+                                       "\n"
+                                       "}\n"
+                                       "\n"
+                                       "\n"
+                                       "QSlider::sub-page:horizontal \n"
+                                       "{\n"
+                                       "    background-color: qlineargradient(spread:pad, x1:0, y1:0.494, x2:1, y2:0.5, stop:0 rgba(98, 9, 54, 255), stop:1 rgba(33, 13, 68, 255))\n"
+                                       "\n"
+                                       "}\n"
+                                       "\n"
+                                       "QSlider::add-page:horizontal \n"
+                                       "{\n"
+                                       "    background-color: rgb(118, 118, 118);\n"
+                                       "\n"
+                                       "}\n"
+                                       "\n"
+                                       "\n"
+                                       "QSlider::handle:horizontal \n"
+                                       "{\n"
+                                       "    background-color: transparent;\n"
+                                       "    width: 14px;\n"
+                                       "    margin: -5px;\n"
+                                       "    border-radius: 6px;\n"
+                                       "\n"
+                                       "}\n"
+                                       "\n"
+                                       "\n"
+                                       "QSlider::handle:horizontal:hover \n"
+                                       "{\n"
+                                       "    background-color: rgb(240, 240, 240);\n"
+                                       "\n"
+                                       "}")
         self.musicSlider.setMinimum(0)
         self.musicSlider.setOrientation(QtCore.Qt.Horizontal)
         self.musicSlider.setObjectName("musicSlider")
@@ -265,7 +263,7 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         self.artistLabel.setFont(font)
         self.artistLabel.setStyleSheet("background: none;\n"
-"color: white;")
+                                       "color: white;")
         self.artistLabel.setText("")
         self.artistLabel.setObjectName("artistLabel")
         self.groupBox_2 = QtWidgets.QGroupBox(self.groupBox)
@@ -276,97 +274,134 @@ class Ui_MainWindow(object):
         self.shuffleButton = QtWidgets.QPushButton(self.groupBox_2)
         self.shuffleButton.setGeometry(QtCore.QRect(10, 40, 30, 20))
         self.shuffleButton.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/shuffle.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                         "border-image: url(img/shuffle.png);\n"
+                                         "background: none;\n"
+                                         "border: none;\n"
+                                         "background-repeat: none;")
         self.shuffleButton.setText("")
         self.shuffleButton.setObjectName("shuffleButton")
         self.repeatThis = QtWidgets.QPushButton(self.groupBox_2)
         self.repeatThis.setGeometry(QtCore.QRect(10, 90, 30, 20))
         self.repeatThis.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/repeatthis.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                      "border-image: url(img/repeatthis.png);\n"
+                                      "background: none;\n"
+                                      "border: none;\n"
+                                      "background-repeat: none;")
         self.repeatThis.setText("")
         self.repeatThis.setObjectName("repeatThis")
         self.volumeButton = QtWidgets.QPushButton(self.groupBox_2)
         self.volumeButton.setGeometry(QtCore.QRect(860, 66, 20, 18))
         self.volumeButton.setStyleSheet("background-color: transparent;\n"
-"border-image: url(img/medium.png);\n"
-"background: none;\n"
-"border: none;\n"
-"background-repeat: none;")
+                                        "border-image: url(img/medium.png);\n"
+                                        "background: none;\n"
+                                        "border: none;\n"
+                                        "background-repeat: none;")
         self.volumeButton.setText("")
         self.volumeButton.setObjectName("volumeButton")
+
         self.imgLabel = QtWidgets.QLabel(self.groupBox)
         self.imgLabel.setGeometry(QtCore.QRect(60, 180, 150, 150))
-        self.imgLabel.setStyleSheet("background: transparent;\n"
-"")
-        self.deleteButton = QtWidgets.QPushButton(self.groupBox)
-        self.deleteButton.setGeometry(QtCore.QRect(145, 360, 30, 30))
-        self.deleteButton.setStyleSheet("background-color: transparent;\n"
-                                         "border-image: url(img/delete.png);\n"
-                                         "background: none;\n"
-                                         "border: none;\n"
-                                         "background-repeat: none;")
-        self.deleteButton.setObjectName("deleteButton")
-
+        self.imgLabel.setStyleSheet("background: transparent;")
         self.imgLabel.setText("")
         self.imgLabel.setObjectName("imgLabel")
+
+        self.deleteButton = QtWidgets.QPushButton(self.groupBox)
+        self.deleteButton.setGeometry(QtCore.QRect(150, 360, 30, 30))
+        self.deleteButton.setStyleSheet("background-color: transparent;\n"
+                                        "border-image: url(img/delete.png);\n"
+                                        "background: none;\n"
+                                        "border: none;\n"
+                                        "background-repeat: none;")
+        self.deleteButton.setObjectName("deleteButton")
+
+        self.dropList = QtWidgets.QComboBox(self.groupBox)
+        self.dropList.addItem('All your music')
+        self.dropList.setGeometry(QtCore.QRect(25, 460, 190, 25))
+        self.dropList.setStyleSheet("font-family: Arial, Helvetica, sans-serif;\n"
+                                    "background-color: transparent;\n"
+                                    "color: #fff;\n"
+                                    "border: 2px solid #cdcdcd;\n"
+                                    "border-radius: 10px;\n"
+                                    "padding: 3px 5px;")
+        self.dropList.setObjectName("dropList")
+
+        self.dropListGear = QtWidgets.QPushButton(self.groupBox)
+        self.dropListGear.setGeometry(QtCore.QRect(224, 463, 20, 20))
+        self.dropListGear.setStyleSheet("border-image: url(img/gear.png);\n"
+                                        "background: none;\n"
+                                        "border: none;\n"
+                                        "background-repeat: none;"
+                                        "::menu-indicator{ image: none; }")
+        self.dropListGear.setObjectName("dropListGear")
+        self.gearMenu = QtWidgets.QMenu(self.groupBox)
+        self.gearMenu.setStyleSheet("QMenu{\n"
+                                    "background-color: #181818;\n"
+                                    "color: #EAE9E9;}\n"
+                                    "QMenu::item{\n"
+                                    "}\n"
+                                    "QMenu::item:selected{\n"
+                                    "background: #252525;}\n"
+                                    "QMenu::separator{\n"
+                                    "height: 10px;\n"
+                                    "margin-left: 10px;\n"
+                                    "margin-right: 5px;\n"
+                                    "image: none}\n")
+        self.gearMenu.addAction("Create new playlist")
+        self.gearMenu.addAction("Delete current playlist")
+        self.dropListGear.setMenu(self.gearMenu)
+
         self.uploadButton = QtWidgets.QPushButton(self.groupBox)
         self.uploadButton.setGeometry(QtCore.QRect(20, 585, 50, 31))
         self.uploadButton.setStyleSheet("QPushButton\n"
-"{\n"
-"    background-color: #138039;\n"
-"    color: #fff;\n"
-"    font-size: 11px;\n"
-"    font-weight: bold;\n"
-"    border: none;\n"
-"    border-radius: 25px;\n"
-"    padding: 5px;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QPushButton::disabled\n"
-"{\n"
-"    background-color: #5c5c5c;\n"
-"\n"
-"}\n"
-"\n"
-"\n"
-"QPushButton::pressed\n"
-"{\n"
-"    background-color: #1DB954;\n"
-"\n"
-"}\n"
-"")
+                                        "{\n"
+                                        "    background-color: #138039;\n"
+                                        "    color: #fff;\n"
+                                        "    font-size: 11px;\n"
+                                        "    font-weight: bold;\n"
+                                        "    border: none;\n"
+                                        "    border-radius: 25px;\n"
+                                        "    padding: 5px;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QPushButton::disabled\n"
+                                        "{\n"
+                                        "    background-color: #5c5c5c;\n"
+                                        "\n"
+                                        "}\n"
+                                        "\n"
+                                        "\n"
+                                        "QPushButton::pressed\n"
+                                        "{\n"
+                                        "    background-color: #1DB954;\n"
+                                        "\n"
+                                        "}\n"
+                                        "")
         self.uploadButton.setObjectName("uploadButton")
 
-#-----------------------
+        # -----------------------
 
         self.edit_btn = QtWidgets.QPushButton(self.groupBox)
         self.edit_btn.setGeometry(QtCore.QRect(90, 360, 28, 28))
         self.edit_btn.setStyleSheet("background-color: transparent;\n"
-                                         "border-image: url(img/edit.png);\n"
-                                         "background: none;\n"
-                                         "border: none;\n"
-                                         "background-repeat: none;")
+                                    "border-image: url(img/edit.png);\n"
+                                    "background: none;\n"
+                                    "border: none;\n"
+                                    "background-repeat: none;")
         self.edit_btn.setText("")
         self.edit_btn.setObjectName("edit_btn")
 
         self.aboutButton = QtWidgets.QPushButton(self.groupBox)
         self.aboutButton.setGeometry(QtCore.QRect(225, 591, 20, 20))
         self.aboutButton.setStyleSheet("background-color: transparent;\n"
-                                         "border-image: url(img/about.png);\n"
-                                         "background: none;\n"
-                                         "border: none;\n"
-                                         "background-repeat: none;")
+                                       "border-image: url(img/about.png);\n"
+                                       "background: none;\n"
+                                       "border: none;\n"
+                                       "background-repeat: none;")
         self.aboutButton.setText("")
         self.aboutButton.setObjectName("aboutButton")
-#-----------------------
+        # -----------------------
         self.groupBox_2.raise_()
         self.prevButton.raise_()
         self.durationLabel.raise_()
@@ -381,6 +416,8 @@ class Ui_MainWindow(object):
         self.titleBarInfoLabel.raise_()
         self.uploadButton.raise_()
         self.deleteButton.raise_()
+        self.dropList.raise_()
+        self.dropListGear.raise_()
         self.closeButton.raise_()
         self.minimizeButton.raise_()
         self.edit_btn.raise_()
@@ -390,40 +427,40 @@ class Ui_MainWindow(object):
         font.setPointSize(11)
         self.listWidget.setFont(font)
         self.listWidget.setStyleSheet("QListView\n"
-"{\n"
-"  background-color: #070202;\n"
-"  alternate-background-color: transparent;\n"
-"   border : none;\n"
-"   color: #fff;\n"
-"   show-decoration-selected: 1;\n"
-"   outline: 0;\n"
-"   border: 0px solid #1d1d1d;\n"
-"}\n"
-"QListView::disabled\n"
-"{\n"
-"   background-color: #000;\n"
-"   color: #212121;\n"
-"    border: none;\n"
-"}\n"
-"QListView::item\n"
-"{\n"                       
-"    background-color: transparent;\n"
-"    padding: 4px;\n"
-"}\n"
-"QListView::item:selected:!active\n"
-"{\n"
-"  color: #1DB954;\n"
-"}\n"
-"QListView::item:selected\n"
-"{\n"
-"  color: #1DB954;\n"
-"}\n"
-"QListView::item:hover {\n"
-"    background-color: transparent;\n"
-"   border: none;\n"
-"   color: #1DB954;\n"
-"\n"
-"}")
+                                      "{\n"
+                                      "  background-color: #070202;\n"
+                                      "  alternate-background-color: transparent;\n"
+                                      "   border : none;\n"
+                                      "   color: #fff;\n"
+                                      "   show-decoration-selected: 1;\n"
+                                      "   outline: 0;\n"
+                                      "   border: 0px solid #1d1d1d;\n"
+                                      "}\n"
+                                      "QListView::disabled\n"
+                                      "{\n"
+                                      "   background-color: #000;\n"
+                                      "   color: #212121;\n"
+                                      "    border: none;\n"
+                                      "}\n"
+                                      "QListView::item\n"
+                                      "{\n"
+                                      "    background-color: transparent;\n"
+                                      "    padding: 4px;\n"
+                                      "}\n"
+                                      "QListView::item:selected:!active\n"
+                                      "{\n"
+                                      "  color: #1DB954;\n"
+                                      "}\n"
+                                      "QListView::item:selected\n"
+                                      "{\n"
+                                      "  color: #1DB954;\n"
+                                      "}\n"
+                                      "QListView::item:hover {\n"
+                                      "    background-color: transparent;\n"
+                                      "   border: none;\n"
+                                      "   color: #1DB954;\n"
+                                      "\n"
+                                      "}")
         self.listWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.listWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.listWidget.setObjectName("listWidget")
@@ -446,6 +483,7 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
