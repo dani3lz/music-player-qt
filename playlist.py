@@ -6,6 +6,18 @@ from PyQt5.QtCore import Qt
 from assets.UI.playlistUI import Ui_Dialog
 
 
+def check_if_exist(playlist_name):
+    try:
+        with open("songs.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+        for i in data["Songs"]:
+            if i["playlist"] == playlist_name:
+                return True
+        return False
+    except Exception as e:
+        print(e)
+
+
 class PlaylistWindow(QMainWindow):
     def __init__(self):
         super(PlaylistWindow, self).__init__()
@@ -20,12 +32,21 @@ class PlaylistWindow(QMainWindow):
         self.setFixedSize(self.width(), self.height())
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon('assets/img/player.ico'))
+        self.ui.tableWidget.itemClicked.connect(self.item_check)
         self.ui.buttonBox.accepted.connect(self.save_playlist)
         self.ui.buttonBox.rejected.connect(self.cancel_action)
         self.errorMessage = None
 
         self.init_table()
         self.cancel = False
+
+    def item_check(self):
+        if self.ui.tableWidget.currentItem() is not None:
+            if self.ui.tableWidget.currentItem().checkState() == Qt.CheckState.Unchecked:
+                self.ui.tableWidget.currentItem().setCheckState(Qt.CheckState.Checked)
+            else:
+                self.ui.tableWidget.currentItem().setCheckState(Qt.CheckState.Unchecked)
+            self.ui.tableWidget.setCurrentItem(None)
 
     def init_table(self):
         try:
@@ -55,19 +76,20 @@ class PlaylistWindow(QMainWindow):
 
     def save_playlist(self):
         if len(self.ui.titleEdit.text()) > 0:
-            self.playlist_name = self.ui.titleEdit.text()
-            self.songs_for_playlist = []
-            for i in range(self.ui.tableWidget.rowCount()):
-                if self.ui.tableWidget.item(i, 0).checkState() == Qt.CheckState.Checked:
-                    self.songs_for_playlist.append(i)
-            if len(self.songs_for_playlist) > 0:
-                self.hide()
+            self.playlist_name = self.ui.titleEdit.text().strip().rstrip()
+            if not check_if_exist(self.playlist_name):
+                self.songs_for_playlist = []
+                for i in range(self.ui.tableWidget.rowCount()):
+                    if self.ui.tableWidget.item(i, 0).checkState() == Qt.CheckState.Checked:
+                        self.songs_for_playlist.append(i)
+                if len(self.songs_for_playlist) > 0:
+                    self.hide()
+                else:
+                    self.ui.errorLabel.setText("You must add at least one song.")
             else:
-                errorMessage = "You must add at least one song."
-                self.ui.errorLabel.setText(errorMessage)
+                self.ui.errorLabel.setText("Playlist with this name already exist.")
         else:
-            errorMessage = "Title shouldn't be empty."
-            self.ui.errorLabel.setText(errorMessage)
+            self.ui.errorLabel.setText("Title shouldn't be empty.")
 
     def closeEvent(self, event):
         self.cancel = True
@@ -77,3 +99,4 @@ class PlaylistWindow(QMainWindow):
     def cancel_action(self):
         self.cancel = True
         self.hide()
+

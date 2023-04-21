@@ -251,6 +251,6 @@ volume_max_focus_css = "background-color: transparent;\n" \
                        "background-repeat: none;"
 
 about_text = "Player<br>" \
-             "Version: 1.0<br>" \
+             "Version: 2.0<br>" \
              "Developer: Daniel Zavorot (dani3lz)<br>" \
              "Github: <a href='https://github.com/dani3lz/Music_Player'>https://github.com/dani3lz/Music_Player</a>"
