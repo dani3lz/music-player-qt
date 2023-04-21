@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayI
     QStyle
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
+
+import playlist
 from assets.UI.playerUI import Ui_MainWindow
 import upload
 from assets.args import *
@@ -185,6 +187,21 @@ class PlayerWindow(QMainWindow):
         self.toolBtnNext.setIcon(self.style().standardIcon(QStyle.SP_MediaSkipForward))
         self.toolBtnNext.clicked.connect(self.next)
         self.toolBar.addButton(self.toolBtnNext)
+
+        # Playlist
+        create_playlist_action = QAction("Create new playlist", self)
+        delete_playlist_action = QAction("Delete current playlist", self)
+        create_playlist_action.triggered.connect(self.create_playlist)
+        self.ui.gearMenu.addActions([create_playlist_action, delete_playlist_action])
+
+    def create_playlist(self):
+        self.app_setEnabled(False)
+        playlist_window.show()
+        while not playlist_window.done:
+            QApplication.processEvents()
+        playlist_window.hide()
+        playlist_window.done = False
+        self.app_setEnabled(True)
 
     def check_toolbar_button(self):
         if self.isPlaying:
@@ -885,4 +902,5 @@ if __name__ == "__main__":
     window = PlayerWindow()
     window.show()
     upload = upload.UploadWindow()
+    playlist_window = playlist.PlaylistWindow()
     sys.exit(app.exec())
