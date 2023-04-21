@@ -346,8 +346,6 @@ class Ui_MainWindow(object):
                                     "margin-left: 10px;\n"
                                     "margin-right: 5px;\n"
                                     "image: none}\n")
-        self.gearMenu.addAction("Create new playlist")
-        self.gearMenu.addAction("Delete current playlist")
         self.dropListGear.setMenu(self.gearMenu)
 
         self.uploadButton = QtWidgets.QPushButton(self.groupBox)
