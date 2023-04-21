@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QAbstractItemView
 
 
 class Ui_Dialog(object):
@@ -38,6 +40,9 @@ class Ui_Dialog(object):
         self.tableWidget.setHorizontalHeaderItem(0, item)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setStretchLastSection(False)
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setFocusPolicy(Qt.NoFocus)
+        self.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
         self.errorLabel = QtWidgets.QLabel(Dialog)
         self.errorLabel.setGeometry(QtCore.QRect(10, 380, 211, 16))
         font = QtGui.QFont()

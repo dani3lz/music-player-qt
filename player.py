@@ -59,7 +59,8 @@ class PlayerWindow(QMainWindow):
         # Read file with songs and settings
         self.row = 0
         self.songs_id_from_playlist = []
-        self.currentPlaylist = "All your music"
+        self.mainPlaylistName = "ALL"
+        self.currentPlaylist = self.mainPlaylistName
         self.read_songs_from_json()
         self.settings_read()
         self.check_cover()
@@ -208,7 +209,7 @@ class PlayerWindow(QMainWindow):
                     i["playlist"] = "Undefined"
             with open("songs.json", "w", encoding="utf-8") as file:
                 json.dump(data, file, indent=4)
-            self.currentPlaylist = "All your music"
+            self.currentPlaylist = self.mainPlaylistName
             self.check_playlists()
             self.change_playlist()
         except Exception as e:
@@ -216,7 +217,7 @@ class PlayerWindow(QMainWindow):
     def check_playlists(self):
         try:
             self.list_of_playlists.clear()
-            self.list_of_playlists.append("All your music")
+            self.list_of_playlists.append(self.mainPlaylistName)
             self.ui.dropList.clear()
             with open("songs.json", "r", encoding="utf-8") as file:
                 data = json.load(file)
@@ -276,7 +277,7 @@ class PlayerWindow(QMainWindow):
         self.row = 0
         self.currentPlaylist = self.ui.dropList.currentText()
         self.ui.gearMenu.clear()
-        if self.currentPlaylist == "All your music":
+        if self.currentPlaylist == self.mainPlaylistName:
             self.ui.gearMenu.addAction(self.create_playlist_action)
         else:
             self.ui.gearMenu.addActions([self.create_playlist_action, self.delete_playlist_action])
@@ -316,7 +317,7 @@ class PlayerWindow(QMainWindow):
             self.artists.clear()
             self.covers.clear()
             self.songs_id_from_playlist.clear()
-            if self.currentPlaylist == "All your music":
+            if self.currentPlaylist == self.mainPlaylistName:
                 for i in data["Songs"]:
                     # title
                     self.titles.append(i["title"])
@@ -351,7 +352,7 @@ class PlayerWindow(QMainWindow):
             self.ui.listWidget.clear()
             self.playlist = QMediaPlaylist(self.player)
 
-            if self.currentPlaylist == "All your music":
+            if self.currentPlaylist == self.mainPlaylistName:
                 count = len(os.listdir("songs"))
                 for nr in range(count):
                     song_name = str(nr) + ".mp3"
