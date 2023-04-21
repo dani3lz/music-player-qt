@@ -197,9 +197,11 @@ class PlayerWindow(QMainWindow):
         self.create_playlist_action.triggered.connect(self.create_playlist)
         self.delete_playlist_action.triggered.connect(self.delete_playlist)
         self.ui.gearMenu.addAction(self.create_playlist_action)
-        self.list_of_playlists = []
+        self.ui.dropList.activated.connect(self.change_playlist)
         self.check_playlists()
+        self.change_playlist()
 
+    # delete current playlist
     def delete_playlist(self):
         try:
             with open("songs.json", "r", encoding="utf-8") as file:
@@ -214,29 +216,32 @@ class PlayerWindow(QMainWindow):
             self.change_playlist()
         except Exception as e:
             print(e)
+
+    # add playlists to drop list
     def check_playlists(self):
         try:
-            self.list_of_playlists.clear()
-            self.list_of_playlists.append(self.mainPlaylistName)
+            name_of_playlists = [self.mainPlaylistName]
             self.ui.dropList.clear()
             with open("songs.json", "r", encoding="utf-8") as file:
                 data = json.load(file)
             for i in data["Songs"]:
                 if i["playlist"] != "Undefined":
-                    playlist = i["playlist"]
+                    playlist_name = i["playlist"]
                     exists = False
-                    for j in self.list_of_playlists:
-                        if playlist == j:
+                    for j in name_of_playlists:
+                        if playlist_name == j:
                             exists = True
                             break
                     if not exists:
-                        self.list_of_playlists.append(playlist)
-
-            for i in self.list_of_playlists:
+                        name_of_playlists.append(playlist_name)
+            for i in name_of_playlists:
                 self.ui.dropList.addItem(i)
+
+            self.ui.dropList.setCurrentText(self.currentPlaylist)
         except Exception as e:
             print(e)
 
+    # create new playlist
     def create_playlist(self):
         self.app_setEnabled(False)
         playlist_window.init_table()
@@ -246,7 +251,6 @@ class PlayerWindow(QMainWindow):
 
         if not playlist_window.cancel:
             playlist_name = playlist_window.playlist_name
-            print(playlist_name)
             songs_for_playlist = playlist_window.songs_for_playlist.copy()
             self.insert_songs_into_playlist(playlist_name, songs_for_playlist)
             self.check_playlists()
@@ -254,6 +258,7 @@ class PlayerWindow(QMainWindow):
             playlist_window.cancel = False
         self.app_setEnabled(True)
 
+    # change value 'playlist' in songs.json
     def insert_songs_into_playlist(self, playlist_name, list):
         try:
             with open("songs.json", "r", encoding="utf-8") as file:
@@ -272,6 +277,7 @@ class PlayerWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+    # change list of songs
     def change_playlist(self):
         self.isPlaying = False
         self.row = 0
@@ -283,22 +289,21 @@ class PlayerWindow(QMainWindow):
             self.ui.gearMenu.addActions([self.create_playlist_action, self.delete_playlist_action])
         self.read_songs_from_json()
 
-    def check_current_playlist(self):
-        if not self.ui.dropList.currentText() == self.currentPlaylist:
-            self.change_playlist()
-
+    # change middle button for toolbar nav
     def check_toolbar_button(self):
         if self.isPlaying:
             self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
         else:
             self.toolBtnControl.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
 
+    # toggle availability of window
     def app_setEnabled(self, b):
         window.setEnabled(b)
         self.toolBtnControl.blockSignals(not b)
         self.toolBtnNext.blockSignals(not b)
         self.toolBtnPrev.blockSignals(not b)
 
+    # show nav buttons in toolbar
     def showEvent(self, event):
         super(PlayerWindow, self).showEvent(event)
         if not self.toolBar.window():
@@ -754,6 +759,7 @@ class PlayerWindow(QMainWindow):
                 self.lastVolume = self.volume
                 self.row = i["Row"]
                 self.mode = i["Mode"]
+                self.currentPlaylist = i["Playlist"]
             self.currentIndex = self.row
         except Exception as e:
             print(e)
@@ -774,7 +780,8 @@ class PlayerWindow(QMainWindow):
         settings_list["Settings"].append({
             "Volume": self.volume,
             "Row": self.row,
-            "Mode": self.mode
+            "Mode": self.mode,
+            "Playlist": self.currentPlaylist
         })
         with open("settings.json", "w", encoding="utf-8") as f:
             json.dump(settings_list, f, indent=4)
@@ -806,7 +813,6 @@ class PlayerWindow(QMainWindow):
         self.check_style_buttons()
         self.check_style_volume()
         self.check_toolbar_button()
-        self.check_current_playlist()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
