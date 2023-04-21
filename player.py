@@ -58,6 +58,8 @@ class PlayerWindow(QMainWindow):
 
         # Read file with songs and settings
         self.row = 0
+        self.songs_id_from_playlist = []
+        self.currentPlaylist = "All your music"
         self.read_songs_from_json()
         self.settings_read()
         self.check_cover()
@@ -189,19 +191,100 @@ class PlayerWindow(QMainWindow):
         self.toolBar.addButton(self.toolBtnNext)
 
         # Playlist
-        create_playlist_action = QAction("Create new playlist", self)
-        delete_playlist_action = QAction("Delete current playlist", self)
-        create_playlist_action.triggered.connect(self.create_playlist)
-        self.ui.gearMenu.addActions([create_playlist_action, delete_playlist_action])
+        self.create_playlist_action = QAction("Create new playlist", self)
+        self.delete_playlist_action = QAction("Delete current playlist", self)
+        self.create_playlist_action.triggered.connect(self.create_playlist)
+        self.delete_playlist_action.triggered.connect(self.delete_playlist)
+        self.ui.gearMenu.addAction(self.create_playlist_action)
+        self.list_of_playlists = []
+        self.check_playlists()
+
+    def delete_playlist(self):
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+            for i in data["Songs"]:
+                if i["playlist"] == self.currentPlaylist:
+                    i["playlist"] = "Undefined"
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(data, file, indent=4)
+            self.currentPlaylist = "All your music"
+            self.check_playlists()
+            self.change_playlist()
+        except Exception as e:
+            print(e)
+    def check_playlists(self):
+        try:
+            self.list_of_playlists.clear()
+            self.list_of_playlists.append("All your music")
+            self.ui.dropList.clear()
+            with open("songs.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+            for i in data["Songs"]:
+                if i["playlist"] != "Undefined":
+                    playlist = i["playlist"]
+                    exists = False
+                    for j in self.list_of_playlists:
+                        if playlist == j:
+                            exists = True
+                            break
+                    if not exists:
+                        self.list_of_playlists.append(playlist)
+
+            for i in self.list_of_playlists:
+                self.ui.dropList.addItem(i)
+        except Exception as e:
+            print(e)
 
     def create_playlist(self):
         self.app_setEnabled(False)
+        playlist_window.init_table()
         playlist_window.show()
-        while not playlist_window.done:
+        while not playlist_window.isHidden():
             QApplication.processEvents()
-        playlist_window.hide()
-        playlist_window.done = False
+
+        if not playlist_window.cancel:
+            playlist_name = playlist_window.playlist_name
+            print(playlist_name)
+            songs_for_playlist = playlist_window.songs_for_playlist.copy()
+            self.insert_songs_into_playlist(playlist_name, songs_for_playlist)
+            self.check_playlists()
+        else:
+            playlist_window.cancel = False
         self.app_setEnabled(True)
+
+    def insert_songs_into_playlist(self, playlist_name, list):
+        try:
+            with open("songs.json", "r", encoding="utf-8") as file:
+                data = json.load(file)
+            j = 0
+            for i in data["Songs"]:
+                if i["playlist"] == "Undefined":
+                    for k in list:
+                        if k == j:
+                            i["playlist"] = playlist_name
+                            list.remove(k)
+                            break
+                    j += 1
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(data, file, indent=4)
+        except Exception as e:
+            print(e)
+
+    def change_playlist(self):
+        self.isPlaying = False
+        self.row = 0
+        self.currentPlaylist = self.ui.dropList.currentText()
+        self.ui.gearMenu.clear()
+        if self.currentPlaylist == "All your music":
+            self.ui.gearMenu.addAction(self.create_playlist_action)
+        else:
+            self.ui.gearMenu.addActions([self.create_playlist_action, self.delete_playlist_action])
+        self.read_songs_from_json()
+
+    def check_current_playlist(self):
+        if not self.ui.dropList.currentText() == self.currentPlaylist:
+            self.change_playlist()
 
     def check_toolbar_button(self):
         if self.isPlaying:
@@ -232,16 +315,32 @@ class PlayerWindow(QMainWindow):
             self.titles.clear()
             self.artists.clear()
             self.covers.clear()
-            for i in data["Songs"]:
-                # title
-                self.titles.append(i["title"])
-                # artist
-                self.artists.append(i["artist"])
-                # cover
-                if i["cover"] == "Undefined":
-                    self.covers.append("no_image.jpg")
-                else:
-                    self.covers.append(i["cover"])
+            self.songs_id_from_playlist.clear()
+            if self.currentPlaylist == "All your music":
+                for i in data["Songs"]:
+                    # title
+                    self.titles.append(i["title"])
+                    # artist
+                    self.artists.append(i["artist"])
+                    # cover
+                    if i["cover"] == "Undefined":
+                        self.covers.append("no_image.jpg")
+                    else:
+                        self.covers.append(i["cover"])
+                    self.songs_id_from_playlist.append(i["id"])
+            else:
+                for i in data["Songs"]:
+                    if i["playlist"] == self.currentPlaylist:
+                        # title
+                        self.titles.append(i["title"])
+                        # artist
+                        self.artists.append(i["artist"])
+                        # cover
+                        if i["cover"] == "Undefined":
+                            self.covers.append("no_image.jpg")
+                        else:
+                            self.covers.append(i["cover"])
+                        self.songs_id_from_playlist.append(i["id"])
         except Exception as e:
             print(e)
         self.read_files_songs()
@@ -252,11 +351,21 @@ class PlayerWindow(QMainWindow):
             self.ui.listWidget.clear()
             self.playlist = QMediaPlaylist(self.player)
 
-            count = len(os.listdir("songs"))
-            for nr in range(count):
-                song_name = str(nr) + ".mp3"
-                self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+            if self.currentPlaylist == "All your music":
+                count = len(os.listdir("songs"))
+                for nr in range(count):
+                    song_name = str(nr) + ".mp3"
+                    self.playlist.addMedia(
+                        QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                    self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+            else:
+                i = 0
+                for nr in self.songs_id_from_playlist:
+                    song_name = str(nr) + ".mp3"
+                    self.playlist.addMedia(
+                        QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                    self.ui.listWidget.addItem(str(i + 1) + ". " + self.titles[i] + " - " + self.artists[i])
+                    i += 1
         except Exception as e:
             print(e)
 
@@ -696,6 +805,7 @@ class PlayerWindow(QMainWindow):
         self.check_style_buttons()
         self.check_style_volume()
         self.check_toolbar_button()
+        self.check_current_playlist()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
