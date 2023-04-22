@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import shutil
+from mutagen.id3 import ID3
 
 
 def suppress_qt_warnings():
@@ -313,6 +314,10 @@ class PlayerWindow(QMainWindow):
     def read_songs_from_json(self):
         if not os.path.exists('songs'):
             os.makedirs('songs')
+        if not os.path.exists("songs.json"):
+            songs_list = {"Songs": []}
+            with open("songs.json", "w", encoding="utf-8") as file:
+                json.dump(songs_list, file, indent=4)
         self.player = QMediaPlayer()
         self.playlist = QMediaPlaylist(self.player)
         try:
@@ -452,24 +457,14 @@ class PlayerWindow(QMainWindow):
                     file_name = file_name_with_ext.rsplit(".", 1)[0]
 
                     try:
-                        if file_name.__contains__("-"):
-                            info_song = file_name.split('-', 1)
-                        elif file_name.__contains__(" "):
-                            info_song = file_name.split(' ', 1)
-                        else:
-                            info_song = file_name
-
-                        if len(info_song) == 2:
-                            song_name = info_song[1].rstrip().strip()
-                            artist = info_song[0].strip().rstrip()
-                        elif len(info_song) == 1:
-                            song_name = info_song[0].rstrip().strip()
-                            artist = ""
-                        elif len(info_song) > 2:
-                            song_name = file_name.rstrip().strip()
-                            artist = ""
-                        else:
-                            song_name = ""
+                        try:
+                            song_info = ID3(fname[0][i])
+                            song_name = song_info['TIT2'].text[0]
+                            artist = song_info['TPE1'].text[0]
+                        except Exception as e:
+                            print(e)
+                            print("ID3 Problem")
+                            song_name = file_name
                             artist = ""
                     except Exception as e:
                         print(e)
@@ -484,12 +479,12 @@ class PlayerWindow(QMainWindow):
                     upload.done = False
 
                     if str(upload.ui.lineEditName.text()) == "":
-                        song_name = "Undefined"
+                        song_name = "None"
                     else:
                         song_name = str(upload.ui.lineEditName.text())
 
                     if str(upload.ui.lineEditArtist.text()) == "":
-                        artist = "Undefined"
+                        artist = "None"
                     else:
                         artist = str(upload.ui.lineEditArtist.text())
 
@@ -498,7 +493,15 @@ class PlayerWindow(QMainWindow):
                     upload.ui.coverLabelInfo.clear()
                     upload.ui.selectedFileInfo.clear()
 
-                    shutil.copy(fname[0][i], "./songs/" + str(nr_of_files) + ".mp3")
+                    path_copy = "./songs/" + str(nr_of_files) + ".mp3"
+                    shutil.copy(fname[0][i], path_copy)
+
+                    try:
+                        song_info = ID3(path_copy)
+                        song_info.delete()
+                    except Exception as e:
+                        print(e)
+                        print("Deleting ID3 from dir songs")
 
                     songs_list["Songs"].append({
                         "id": nr_of_files,
