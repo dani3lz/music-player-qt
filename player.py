@@ -447,6 +447,8 @@ class PlayerWindow(QMainWindow):
                 self.ui.titleBarInfoLabel.setText("Uploading... 0%")
                 QApplication.processEvents()
                 nr = len(fname[0])
+                upload.isClicked = False
+                upload.ui.checkboxPlaylist.setCheckState(Qt.CheckState.Unchecked)
                 for i in range(nr):
                     percent = round((i / nr) * 100)
                     self.setWindowTitle(name_window + " | Uploading... " + str(percent) + "%")
@@ -472,10 +474,17 @@ class PlayerWindow(QMainWindow):
                         song_name = ""
                         artist = ""
 
-                    upload.start(file_name_with_ext, song_name, artist, nr_of_files, i, nr)
+                    all_playlists = [self.ui.dropList.itemText(i) for i in range(self.ui.dropList.count())]
+                    upload.start(file_name_with_ext,
+                                 song_name,
+                                 artist,
+                                 nr_of_files,
+                                 i,
+                                 nr,
+                                 all_playlists)
+
                     while not upload.done:
                         QApplication.processEvents()
-
                     upload.done = False
 
                     if str(upload.ui.lineEditName.text()) == "":
@@ -492,6 +501,7 @@ class PlayerWindow(QMainWindow):
                     upload.ui.lineEditArtist.clear()
                     upload.ui.coverLabelInfo.clear()
                     upload.ui.selectedFileInfo.clear()
+                    upload.ui.playlistDropList.clear()
 
                     path_copy = "./songs/" + str(nr_of_files) + ".mp3"
                     shutil.copy(fname[0][i], path_copy)
@@ -503,12 +513,15 @@ class PlayerWindow(QMainWindow):
                         print(e)
                         print("Deleting ID3 from dir songs")
 
+                    if upload.selectedPlaylist == self.mainPlaylistName:
+                        upload.selectedPlaylist = "Undefined"
+
                     songs_list["Songs"].append({
                         "id": nr_of_files,
                         "title": song_name,
                         "artist": artist,
                         "cover": upload.file_name_final,
-                        "playlist": "Undefined"
+                        "playlist": upload.selectedPlaylist
                     })
 
                     nr_of_files += 1
@@ -532,13 +545,14 @@ class PlayerWindow(QMainWindow):
 
     # Delete button
     def delete_btn(self):
-        id_selected = self.row
         try:
+            path = self.playlist.currentMedia().canonicalUrl().path()
+            id_selected = int(path.split("/")[-1].rsplit(".", 1)[0])
             with open("songs.json", "r", encoding="utf-8") as file:
                 songs_list = json.load(file)
             open_file = True
         except:
-            print("No songs!")
+            print("No songs.")
             open_file = False
 
         if open_file:
@@ -552,6 +566,8 @@ class PlayerWindow(QMainWindow):
                         os.remove("./covers/" + song["cover"])
                 else:
                     os.rename("./songs/" + str(song["id"]) + ".mp3", "./songs/" + str(last_id) + ".mp3")
+                    if song["playlist"] == self.mainPlaylistName:
+                        song["playlist"] = "Undefined"
                     if not song["cover"] == "Undefined":
                         cover_name_with_ex = song["cover"]
                         ext = cover_name_with_ex.split(".")[1]
@@ -562,7 +578,7 @@ class PlayerWindow(QMainWindow):
                             "title": song["title"],
                             "artist": song["artist"],
                             "cover": cover_new_name,
-                            "playlist": "Undefined"
+                            "playlist": song["playlist"]
                         })
                     else:
                         songs_list_new["Songs"].append({
@@ -570,7 +586,7 @@ class PlayerWindow(QMainWindow):
                             "title": song["title"],
                             "artist": song["artist"],
                             "cover": song["cover"],
-                            "playlist": "Undefined"
+                            "playlist": song["playlist"]
                         })
 
                     last_id += 1
@@ -585,64 +601,83 @@ class PlayerWindow(QMainWindow):
         self.timer.stop()
         self.app_setEnabled(False)
         cancel_edit = False
-        id_selected = self.row
         try:
+            path = self.playlist.currentMedia().canonicalUrl().path()
+            id_selected = int(path.split("/")[-1].rsplit(".", 1)[0])
             with open("songs.json", "r", encoding="utf-8") as file:
                 songs_list = json.load(file)
             open_file = True
         except:
-            print("No songs!")
+            print("No songs.")
             open_file = False
+            self.timer.start()
+            self.app_setEnabled(True)
 
         if open_file:
             songs_list_new = {"Songs": []}
-
             for song in songs_list["Songs"]:
                 if song["id"] == id_selected:
-                    upload.edit_btn(song["id"], song["title"], song["artist"], song["cover"])
+                    all_playlists = [self.ui.dropList.itemText(i) for i in range(self.ui.dropList.count())]
+                    if song["playlist"] == "Undefined":
+                        song["playlist"] = self.mainPlaylistName
+                    upload.edit_btn(song["id"],
+                                    song["title"],
+                                    song["artist"],
+                                    song["cover"],
+                                    song["playlist"],
+                                    all_playlists)
                     while not upload.done:
                         QApplication.processEvents()
                     upload.done = False
                     if upload.cancel_edit:
                         cancel_edit = True
                         upload.cancel_edit = False
+                        if song["playlist"] == self.mainPlaylistName:
+                            song["playlist"] = "Undefined"
                         songs_list_new["Songs"].append({
                             "id": song["id"],
                             "title": song["title"],
                             "artist": song["artist"],
                             "cover": song["cover"],
-                            "playlist": "Undefined"
+                            "playlist": song["playlist"]
                         })
                     else:
                         if str(upload.ui.lineEditName.text()) == "":
-                            song_name = "Undefined"
+                            song_name = "None"
                         else:
                             song_name = str(upload.ui.lineEditName.text())
 
                         if str(upload.ui.lineEditArtist.text()) == "":
-                            artist = "Undefined"
+                            artist = "None"
                         else:
                             artist = str(upload.ui.lineEditArtist.text())
+
+                        if upload.selectedPlaylist == self.mainPlaylistName:
+                            upload.selectedPlaylist = "Undefined"
+
                         songs_list_new["Songs"].append({
                             "id": song["id"],
                             "title": song_name,
                             "artist": artist,
                             "cover": upload.file_name_final,
-                            "playlist": "Undefined"
+                            "playlist": upload.selectedPlaylist
                         })
 
                     upload.ui.lineEditName.clear()
                     upload.ui.lineEditArtist.clear()
                     upload.ui.coverLabelInfo.clear()
                     upload.ui.selectedFileInfo.clear()
+                    upload.ui.playlistDropList.clear()
                     upload.ui.pushButton_Skip.setText("Skip all")
                 else:
+                    if song["playlist"] == self.mainPlaylistName:
+                        song["playlist"] = "Undefined"
                     songs_list_new["Songs"].append({
                         "id": song["id"],
                         "title": song["title"],
                         "artist": song["artist"],
                         "cover": song["cover"],
-                        "playlist": "Undefined"
+                        "playlist": song["playlist"]
                     })
 
             if not cancel_edit:

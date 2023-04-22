@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
         self.imgLabel.setObjectName("imgLabel")
 
         self.deleteButton = QtWidgets.QPushButton(self.groupBox)
-        self.deleteButton.setGeometry(QtCore.QRect(150, 360, 30, 30))
+        self.deleteButton.setGeometry(QtCore.QRect(142, 361, 28, 28))
         self.deleteButton.setStyleSheet("background-color: transparent;\n"
                                         "border-image: url(img/delete.png);\n"
                                         "background: none;\n"
@@ -316,9 +316,10 @@ class Ui_MainWindow(object):
 
         self.dropList = QtWidgets.QComboBox(self.groupBox)
         self.dropList.addItem('All your music')
-        self.dropList.setGeometry(QtCore.QRect(25, 460, 190, 25))
+        self.dropList.setGeometry(QtCore.QRect(28, 460, 187, 25))
         self.dropList.setStyleSheet("font-family: Arial, Helvetica, sans-serif;\n"
                                     "background-color: transparent;\n"
+                                    "font: 12px;\n"
                                     "color: #fff;\n"
                                     "border: 2px solid #cdcdcd;\n"
                                     "border-radius: 10px;\n"
@@ -378,10 +379,8 @@ class Ui_MainWindow(object):
                                         "")
         self.uploadButton.setObjectName("uploadButton")
 
-        # -----------------------
-
         self.edit_btn = QtWidgets.QPushButton(self.groupBox)
-        self.edit_btn.setGeometry(QtCore.QRect(90, 360, 28, 28))
+        self.edit_btn.setGeometry(QtCore.QRect(94, 360, 28, 28))
         self.edit_btn.setStyleSheet("background-color: transparent;\n"
                                     "border-image: url(img/edit.png);\n"
                                     "background: none;\n"
@@ -399,7 +398,7 @@ class Ui_MainWindow(object):
                                        "background-repeat: none;")
         self.aboutButton.setText("")
         self.aboutButton.setObjectName("aboutButton")
-        # -----------------------
+
         self.groupBox_2.raise_()
         self.prevButton.raise_()
         self.durationLabel.raise_()
@@ -438,7 +437,7 @@ class Ui_MainWindow(object):
                                       "{\n"
                                       "   background-color: #000;\n"
                                       "   color: #212121;\n"
-                                      "    border: none;\n"
+                                      "   border: none;\n"
                                       "}\n"
                                       "QListView::item\n"
                                       "{\n"

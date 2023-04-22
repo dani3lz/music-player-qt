@@ -1,84 +1,150 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.Qt import Qt
 
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(434, 215)
-        Form.setStyleSheet("background-color: #323232")
-        self.nameLabel = QtWidgets.QLabel(Form)
-        self.nameLabel.setGeometry(QtCore.QRect(20, 60, 81, 21))
+class Ui_Dialog(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(429, 236)
+        Dialog.setStyleSheet("background-color: #323232;")
+        self.selectedFileInfo = QtWidgets.QLabel(Dialog)
+        self.selectedFileInfo.setGeometry(QtCore.QRect(10, 10, 421, 16))
         font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setFamily("Arial")
+        font.setPointSize(11)
+        self.selectedFileInfo.setFont(font)
+        self.selectedFileInfo.setStyleSheet("color: #fff;")
+        self.selectedFileInfo.setObjectName("selectedFileInfo")
+        self.nameLabel = QtWidgets.QLabel(Dialog)
+        self.nameLabel.setGeometry(QtCore.QRect(30, 50, 51, 21))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(16)
         self.nameLabel.setFont(font)
-        self.nameLabel.setStyleSheet("color:#fff;")
+        self.nameLabel.setStyleSheet("color: #fff;")
         self.nameLabel.setObjectName("nameLabel")
-        self.artistLabel = QtWidgets.QLabel(Form)
-        self.artistLabel.setGeometry(QtCore.QRect(20, 100, 81, 21))
+        self.coverLabel = QtWidgets.QLabel(Dialog)
+        self.coverLabel.setGeometry(QtCore.QRect(30, 130, 71, 21))
         font = QtGui.QFont()
-        font.setPointSize(14)
-        self.artistLabel.setFont(font)
-        self.artistLabel.setStyleSheet("color:#fff;")
-        self.artistLabel.setObjectName("artistLabel")
-        self.coverLabel = QtWidgets.QLabel(Form)
-        self.coverLabel.setGeometry(QtCore.QRect(20, 140, 81, 21))
-        font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setFamily("Arial")
+        font.setPointSize(16)
         self.coverLabel.setFont(font)
-        self.coverLabel.setStyleSheet("color:#fff;")
+        self.coverLabel.setStyleSheet("color: #fff;")
         self.coverLabel.setObjectName("coverLabel")
-        self.pushButton_Cover = QtWidgets.QPushButton(Form)
-        self.pushButton_Cover.setGeometry(QtCore.QRect(90, 140, 89, 25))
-        self.pushButton_Cover.setObjectName("pushButton_Cover")
-        self.pushButton_Cover.setStyleSheet("background: #fff; color:#000;")
-        self.coverLabelInfo = QtWidgets.QLabel(Form)
-        self.coverLabelInfo.setGeometry(QtCore.QRect(190, 140, 231, 21))
+        self.playlistLabel = QtWidgets.QLabel(Dialog)
+        self.playlistLabel.setGeometry(QtCore.QRect(30, 170, 71, 21))
         font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(16)
+        self.playlistLabel.setFont(font)
+        self.playlistLabel.setStyleSheet("color: #fff;")
+        self.playlistLabel.setObjectName("playlistLabel")
+        self.lineEditName = QtWidgets.QLineEdit(Dialog)
+        self.lineEditName.setGeometry(QtCore.QRect(110, 50, 301, 21))
+        self.lineEditName.setStyleSheet(
+            "background: none; color: #000; border: 2px solid #fff; border-radius: 10px; padding-left: 3px;")
+        self.lineEditName.setText("")
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.lineEditName.setFont(font)
+        self.lineEditName.setObjectName("lineEditName")
+        self.pushButton_Cover = QtWidgets.QPushButton(Dialog)
+        self.pushButton_Cover.setGeometry(QtCore.QRect(110, 130, 75, 23))
+        self.pushButton_Cover.setStyleSheet("background: none;")
+        self.pushButton_Cover.setObjectName("pushButton_Cover")
+        self.coverLabelInfo = QtWidgets.QLabel(Dialog)
+        self.coverLabelInfo.setGeometry(QtCore.QRect(190, 130, 221, 21))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
         font.setPointSize(11)
         self.coverLabelInfo.setFont(font)
-        self.coverLabelInfo.setStyleSheet("color:#fff;")
-        self.coverLabelInfo.setText("")
+        self.coverLabelInfo.setStyleSheet("color: #fff;")
         self.coverLabelInfo.setObjectName("coverLabelInfo")
-        self.pushButton_Ok = QtWidgets.QPushButton(Form)
-        self.pushButton_Ok.setGeometry(QtCore.QRect(330, 180, 89, 25))
+        self.pushButton_Ok = QtWidgets.QPushButton(Dialog)
+        self.pushButton_Ok.setGeometry(QtCore.QRect(340, 200, 75, 23))
+        self.pushButton_Ok.setStyleSheet("background: none;")
         self.pushButton_Ok.setObjectName("pushButton_Ok")
-        self.pushButton_Ok.setStyleSheet("background: #fff; color:#000;")
-        self.selectedFileInfo = QtWidgets.QLabel(Form)
-        self.selectedFileInfo.setGeometry(QtCore.QRect(20, 10, 401, 21))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.selectedFileInfo.setFont(font)
-        self.selectedFileInfo.setStyleSheet("color:#fff;")
-        self.selectedFileInfo.setObjectName("selectedFileInfo")
-        self.lineEditName = QtWidgets.QLineEdit(Form)
-        self.lineEditName.setGeometry(QtCore.QRect(90, 60, 331, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.lineEditName.setFont(font)
-        self.lineEditName.setStyleSheet("background: #fff; color:#000;")
-        self.lineEditName.setObjectName("lineEditName")
-        self.lineEditArtist = QtWidgets.QLineEdit(Form)
-        self.lineEditArtist.setGeometry(QtCore.QRect(90, 100, 331, 31))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.lineEditArtist.setFont(font)
-        self.lineEditArtist.setStyleSheet("background: #fff; color:#000;")
-        self.lineEditArtist.setObjectName("lineEditArtist")
-        self.pushButton_Skip = QtWidgets.QPushButton(Form)
-        self.pushButton_Skip.setGeometry(QtCore.QRect(10, 180, 89, 25))
+        self.pushButton_Skip = QtWidgets.QPushButton(Dialog)
+        self.pushButton_Skip.setGeometry(QtCore.QRect(260, 200, 75, 23))
+        self.pushButton_Skip.setStyleSheet("background: none;")
         self.pushButton_Skip.setObjectName("pushButton_Skip")
-        self.pushButton_Skip.setStyleSheet("background: #fff; color:#000;")
+        self.artistLabel = QtWidgets.QLabel(Dialog)
+        self.artistLabel.setGeometry(QtCore.QRect(30, 90, 61, 21))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(16)
+        self.artistLabel.setFont(font)
+        self.artistLabel.setStyleSheet("color: #fff;")
+        self.artistLabel.setObjectName("artistLabel")
+        self.lineEditArtist = QtWidgets.QLineEdit(Dialog)
+        self.lineEditArtist.setGeometry(QtCore.QRect(110, 90, 301, 21))
+        self.lineEditArtist.setStyleSheet(
+            "background: none; color: #000; border: 2px solid #fff; border-radius: 10px; padding-left: 3px;")
+        self.lineEditArtist.setText("")
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.lineEditArtist.setFont(font)
+        self.lineEditArtist.setObjectName("lineEditArtist")
+        self.playlistDropList = QtWidgets.QComboBox(Dialog)
+        self.playlistDropList.setGeometry(QtCore.QRect(110, 170, 131, 22))
+        self.playlistDropList.view().window().setWindowFlags(Qt.Popup |
+                                                             Qt.FramelessWindowHint |
+                                                             Qt.NoDropShadowWindowHint)
+        self.playlistDropList.view().window().setAttribute(Qt.WA_TranslucentBackground)
+        self.playlistDropList.setStyleSheet("QComboBox{\n"
+                                            "font-family: Arial, Helvetica, sans-serif;\n"
+                                            "font: 12px;\n"
+                                            "background: #fff;\n"
+                                            "color: #000;\n"
+                                            "border: 2px solid #fff;\n"
+                                            "border-radius: 10px;\n"
+                                            "padding-left: 5px;\n"
+                                            "}\n"
+                                            "QComboBox::drop-down {\n"
+                                            "border: 0px;\n"
+                                            "}\n"
+                                            "QComboBox::down-arrow {\n"
+                                            "image: url(assets/img/arrow_down.png);\n"
+                                            "width: 12px;\n"
+                                            "height: 12px;\n"
+                                            "margin-right: 8px;\n"
+                                            "}\n"
+                                            "QComboBox QAbstractItemView {\n"
+                                            "background: #fff;\n"
+                                            "padding: 2px;\n"
+                                            "border-radius: 8px;\n"
+                                            "}\n"
+                                            "QComboBox::disabled {\n"
+                                            "background: #A6A6A6;\n"
+                                            "color: #D0D0D0;"
+                                            "border: 2px solid #A6A6A6;\n"
+                                            "}")
+        self.playlistDropList.setObjectName("playlistDropList")
 
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
+        self.checkboxPlaylist = QtWidgets.QCheckBox(Dialog)
+        self.checkboxPlaylist.setGeometry(QtCore.QRect(250, 168, 170, 25))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.checkboxPlaylist.setFont(font)
+        self.checkboxPlaylist.setStyleSheet("color: #fff;")
+        self.checkboxPlaylist.setObjectName("checkboxPlaylist")
 
-    def retranslateUi(self, Form):
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.nameLabel.setText(_translate("Form", "Name:"))
-        self.artistLabel.setText(_translate("Form", "Artist:"))
-        self.coverLabel.setText(_translate("Form", "Cover:"))
-        self.pushButton_Cover.setText(_translate("Form", "Upload"))
-        self.pushButton_Ok.setText(_translate("Form", "Ok"))
-        self.selectedFileInfo.setText(_translate("Form", "Name of selected file mp3"))
-        self.pushButton_Skip.setText(_translate("Form", "Skip all"))
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        self.selectedFileInfo.setText(_translate("Dialog", "TextLabel"))
+        self.nameLabel.setText(_translate("Dialog", "Title:"))
+        self.coverLabel.setText(_translate("Dialog", "Cover:"))
+        self.playlistLabel.setText(_translate("Dialog", "Playlist:"))
+        self.pushButton_Cover.setText(_translate("Dialog", "Browse"))
+        self.coverLabelInfo.setText(_translate("Dialog", "TextLabel"))
+        self.pushButton_Ok.setText(_translate("Dialog", "Ok"))
+        self.pushButton_Skip.setText(_translate("Dialog", "Skip all"))
+        self.artistLabel.setText(_translate("Dialog", "Artist:"))
+        self.checkboxPlaylist.setText(_translate("Dialog", "by default for the following"))
