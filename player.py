@@ -1,19 +1,21 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog, \
-    QStyle
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+import json
+import os
+import shutil
+import sys
+
+from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir, QLine
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog, \
+    QStyle, QLineEdit
+from PyQt5.QtWinExtras import QWinThumbnailToolBar, QWinThumbnailToolButton
+from PyQt5.uic.properties import QtGui
+from mutagen.id3 import ID3
 
 import playlist
-from assets.UI.playerUI import Ui_MainWindow
 import upload
+from assets.UI.playerUI import Ui_MainWindow
 from assets.args import *
-from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
-from PyQt5.QtWinExtras import QWinThumbnailToolBar, QWinThumbnailToolButton
-import os
-import sys
-import json
-import shutil
-from mutagen.id3 import ID3
 
 
 def suppress_qt_warnings():
@@ -201,6 +203,18 @@ class PlayerWindow(QMainWindow):
         self.ui.dropList.activated.connect(self.change_playlist)
         self.check_playlists()
         self.change_playlist()
+
+        # Search
+        self.ui.clear_search.clicked.connect(self.ui.searchBar.clear)
+        self.search_text = None
+
+    def check_search_bar(self):
+        if not self.ui.searchBar.text():
+            self.ui.clear_search.hide()
+            self.search_text = None
+        else:
+            self.ui.clear_search.show()
+            self.search_text = self.ui.searchBar.text()
 
     # delete current playlist
     def delete_playlist(self):
@@ -709,6 +723,8 @@ class PlayerWindow(QMainWindow):
     def mousePressEvent(self, event):
         self.start = self.mapToGlobal(event.pos())
         self.pressing = True
+        if isinstance(self.ui.searchBar, QLineEdit):
+            self.ui.searchBar.clearFocus()
 
     # Drag app
     def mouseMoveEvent(self, event):
@@ -851,6 +867,7 @@ class PlayerWindow(QMainWindow):
         self.check_style_buttons()
         self.check_style_volume()
         self.check_toolbar_button()
+        self.check_search_bar()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
@@ -986,6 +1003,7 @@ class PlayerWindow(QMainWindow):
 
     def check_style_buttons(self):
         if self.isEnabled():
+            self.ui.clear_search.setStyleSheet(clear_search_css)
             if self.ui.dropListGear.underMouse():
                 self.ui.dropListGear.setStyleSheet(gear_focus_css)
             else:
