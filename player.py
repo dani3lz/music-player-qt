@@ -1058,4 +1058,5 @@ if __name__ == "__main__":
     window.show()
     upload = upload.UploadWindow()
     playlist_window = playlist.PlaylistWindow()
+    window.ui.dropList.setStyleSheet(drop_list_css)
     sys.exit(app.exec())

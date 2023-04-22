@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import QStyledItemDelegate
 
 
 class Ui_Dialog(object):
@@ -93,7 +94,10 @@ class Ui_Dialog(object):
                                                              Qt.FramelessWindowHint |
                                                              Qt.NoDropShadowWindowHint)
         self.playlistDropList.view().window().setAttribute(Qt.WA_TranslucentBackground)
-        self.playlistDropList.setStyleSheet("QComboBox{\n"
+        itemDelegate = QStyledItemDelegate()
+        self.playlistDropList.setItemDelegate(itemDelegate)
+        self.playlistDropList.setObjectName("playlistDropList")
+        self.playlistDropList.setStyleSheet("#playlistDropList{\n"
                                             "font-family: Arial, Helvetica, sans-serif;\n"
                                             "font: 12px;\n"
                                             "background: #fff;\n"
@@ -102,23 +106,23 @@ class Ui_Dialog(object):
                                             "border-radius: 10px;\n"
                                             "padding-left: 5px;\n"
                                             "}\n"
-                                            "QComboBox::drop-down {\n"
+                                            "#playlistDropList::drop-down {\n"
                                             "border: 0px;\n"
                                             "}\n"
-                                            "QComboBox::down-arrow {\n"
+                                            "#playlistDropList::down-arrow {\n"
                                             "image: url(assets/img/arrow_down.png);\n"
                                             "width: 12px;\n"
                                             "height: 12px;\n"
                                             "margin-right: 8px;\n"
                                             "}\n"
-                                            "QComboBox QAbstractItemView {\n"
+                                            "#playlistDropList QAbstractItemView {\n"
                                             "background: #fff;\n"
                                             "padding: 2px;\n"
                                             "border-radius: 8px;\n"
                                             "}\n"
-                                            "QComboBox::disabled {\n"
+                                            "#playlistDropList::disabled {\n"
                                             "background: #A6A6A6;\n"
-                                            "color: #D0D0D0;"
+                                            "color: #D0D0D0;\n"
                                             "border: 2px solid #A6A6A6;\n"
                                             "}")
         self.playlistDropList.setObjectName("playlistDropList")
