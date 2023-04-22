@@ -282,3 +282,9 @@ drop_list_css = "#dropList{\n" \
                 "color: #D0D0D0;\n" \
                 "border: 2px solid #A6A6A6;\n" \
                 "}"
+
+clear_search_css = "background-color: transparent;\n" \
+                   "border-image: url(assets/img/search_clear.png);\n" \
+                   "background: none;\n" \
+                   "border: none;\n" \
+                   "background-repeat: none;"

@@ -1,9 +1,11 @@
-from PyQt5.QtWidgets import QMainWindow, QFileDialog
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
-from assets.UI.uploadUI import Ui_Dialog
 import os
 import shutil
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QFileDialog
+
+from assets.UI.uploadUI import Ui_Dialog
 
 
 class UploadWindow(QMainWindow):

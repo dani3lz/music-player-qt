@@ -435,11 +435,22 @@ class Ui_MainWindow(object):
         self.searchBar.setGeometry(QtCore.QRect(35, 160, 200, 25))
         font = QtGui.QFont()
         font.setFamily("Sans Serif")
-        font.setPointSize(11)
+        font.setPointSize(10)
         self.searchBar.setFont(font)
         self.searchBar.setStyleSheet(
-            "background: #181818; color: #cdcdcd; border: 2px solid #181818; border-radius: 10px; padding-left: 3px;")
+            "background: #181818; color: #cdcdcd; border: 2px solid #181818; border-radius: 10px; padding-left: 3px; padding-right: 22px;")
         self.searchBar.setObjectName("searchBar")
+        self.searchBar.setPlaceholderText("Search")
+
+        self.clear_search = QtWidgets.QPushButton(self.groupBox)
+        self.clear_search.setGeometry(QtCore.QRect(216, 167, 12, 12))
+        self.clear_search.setStyleSheet("background-color: transparent;\n"
+                                        "border-image: url(img/search_clear.png);\n"
+                                        "background: none;\n"
+                                        "border: none;\n"
+                                        "background-repeat: none;")
+        self.clear_search.setText("")
+        self.clear_search.setObjectName("clear_search")
 
         self.groupBox_2.raise_()
         self.prevButton.raise_()
@@ -461,6 +472,7 @@ class Ui_MainWindow(object):
         self.minimizeButton.raise_()
         self.edit_btn.raise_()
         self.searchBar.raise_()
+        self.clear_search.raise_()
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
         self.listWidget.setGeometry(QtCore.QRect(250, 170, 801, 485))
         font = QtGui.QFont()
