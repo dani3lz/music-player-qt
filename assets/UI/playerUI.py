@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import QStyledItemDelegate
 
 
 class Ui_MainWindow(object):
@@ -300,13 +302,13 @@ class Ui_MainWindow(object):
         self.volumeButton.setObjectName("volumeButton")
 
         self.imgLabel = QtWidgets.QLabel(self.groupBox)
-        self.imgLabel.setGeometry(QtCore.QRect(60, 180, 150, 150))
+        self.imgLabel.setGeometry(QtCore.QRect(60, 220, 150, 150))
         self.imgLabel.setStyleSheet("background: transparent;")
         self.imgLabel.setText("")
         self.imgLabel.setObjectName("imgLabel")
 
         self.deleteButton = QtWidgets.QPushButton(self.groupBox)
-        self.deleteButton.setGeometry(QtCore.QRect(142, 361, 28, 28))
+        self.deleteButton.setGeometry(QtCore.QRect(146, 391, 28, 28))
         self.deleteButton.setStyleSheet("background-color: transparent;\n"
                                         "border-image: url(img/delete.png);\n"
                                         "background: none;\n"
@@ -317,14 +319,44 @@ class Ui_MainWindow(object):
         self.dropList = QtWidgets.QComboBox(self.groupBox)
         self.dropList.addItem('All your music')
         self.dropList.setGeometry(QtCore.QRect(28, 460, 187, 25))
-        self.dropList.setStyleSheet("font-family: Arial, Helvetica, sans-serif;\n"
-                                    "background-color: transparent;\n"
-                                    "font: 12px;\n"
-                                    "color: #fff;\n"
-                                    "border: 2px solid #cdcdcd;\n"
-                                    "border-radius: 10px;\n"
-                                    "padding: 3px 5px;")
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.dropList.setFont(font)
+        self.dropList.view().window().setWindowFlags(Qt.Popup |
+                                                     Qt.FramelessWindowHint |
+                                                     Qt.NoDropShadowWindowHint)
+        self.dropList.view().window().setAttribute(Qt.WA_TranslucentBackground)
+        itemDelegate = QStyledItemDelegate()
+        self.dropList.setItemDelegate(itemDelegate)
         self.dropList.setObjectName("dropList")
+        self.dropList.setStyleSheet("#dropList {\n"
+                                    "background: #181818;\n"
+                                    "color: #cdcdcd;\n"
+                                    "border: 2px solid #000;\n"
+                                    "border-radius: 10px;\n"
+                                    "padding-left: 5px;\n"
+                                    "}\n"
+                                    "#dropList::drop-down {\n"
+                                    "border: 0px;\n"
+                                    "}\n"
+                                    "#dropList::down-arrow {\n"
+                                    "image: url(assets/img/arrow_down.png);\n"
+                                    "width: 12px;\n"
+                                    "height: 12px;\n"
+                                    "margin-right: 8px;\n"
+                                    "}\n"
+                                    "#dropList QAbstractItemView {\n"
+                                    "background: #000;\n"
+                                    "color: #cdcdcd;\n"
+                                    "padding: 2px;\n"
+                                    "border-radius: 8px;\n"
+                                    "}\n"
+                                    "#dropList::disabled {\n"
+                                    "background: #A6A6A6;\n"
+                                    "color: #D0D0D0;\n"
+                                    "border: 2px solid #A6A6A6;\n"
+                                    "}")
 
         self.dropListGear = QtWidgets.QPushButton(self.groupBox)
         self.dropListGear.setGeometry(QtCore.QRect(224, 463, 20, 20))
@@ -380,7 +412,7 @@ class Ui_MainWindow(object):
         self.uploadButton.setObjectName("uploadButton")
 
         self.edit_btn = QtWidgets.QPushButton(self.groupBox)
-        self.edit_btn.setGeometry(QtCore.QRect(94, 360, 28, 28))
+        self.edit_btn.setGeometry(QtCore.QRect(98, 390, 28, 28))
         self.edit_btn.setStyleSheet("background-color: transparent;\n"
                                     "border-image: url(img/edit.png);\n"
                                     "background: none;\n"
@@ -398,6 +430,16 @@ class Ui_MainWindow(object):
                                        "background-repeat: none;")
         self.aboutButton.setText("")
         self.aboutButton.setObjectName("aboutButton")
+
+        self.searchBar = QtWidgets.QLineEdit(self.groupBox)
+        self.searchBar.setGeometry(QtCore.QRect(35, 160, 200, 25))
+        font = QtGui.QFont()
+        font.setFamily("Sans Serif")
+        font.setPointSize(11)
+        self.searchBar.setFont(font)
+        self.searchBar.setStyleSheet(
+            "background: #181818; color: #cdcdcd; border: 2px solid #181818; border-radius: 10px; padding-left: 3px;")
+        self.searchBar.setObjectName("searchBar")
 
         self.groupBox_2.raise_()
         self.prevButton.raise_()
@@ -418,6 +460,7 @@ class Ui_MainWindow(object):
         self.closeButton.raise_()
         self.minimizeButton.raise_()
         self.edit_btn.raise_()
+        self.searchBar.raise_()
         self.listWidget = QtWidgets.QListWidget(self.centralwidget)
         self.listWidget.setGeometry(QtCore.QRect(250, 170, 801, 485))
         font = QtGui.QFont()

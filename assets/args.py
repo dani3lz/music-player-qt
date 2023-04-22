@@ -254,3 +254,31 @@ about_text = "Player<br>" \
              "Version: 2.0<br>" \
              "Developer: Daniel Zavorot (dani3lz)<br>" \
              "Github: <a href='https://github.com/dani3lz/Music_Player'>https://github.com/dani3lz/Music_Player</a>"
+
+drop_list_css = "#dropList{\n" \
+                "background: #181818;\n" \
+                "color: #cdcdcd;\n" \
+                "border: 2px solid #000;\n" \
+                "border-radius: 10px;\n" \
+                "padding-left: 5px;\n" \
+                "}\n" \
+                "#dropList::drop-down {\n" \
+                "border: 0px;\n" \
+                "}\n" \
+                "#dropList::down-arrow {\n" \
+                "image: url(assets/img/arrow_down.png);\n" \
+                "width: 12px;\n" \
+                "height: 12px;\n" \
+                "margin-right: 8px;\n" \
+                "}\n" \
+                "#dropList QAbstractItemView {\n" \
+                "background: #000;\n" \
+                "color: #cdcdcd;\n" \
+                "padding: 2px;\n" \
+                "border-radius: 8px;\n" \
+                "}\n" \
+                "#dropList::disabled {\n" \
+                "background: #A6A6A6;\n" \
+                "color: #D0D0D0;\n" \
+                "border: 2px solid #A6A6A6;\n" \
+                "}"
