@@ -256,17 +256,17 @@ about_text = "Player<br>" \
              "Github: <a href='https://github.com/dani3lz/Music_Player'>https://github.com/dani3lz/Music_Player</a>"
 
 drop_list_css = "#dropList{\n" \
-                "background: #181818;\n" \
+                "background: #000;\n" \
                 "color: #cdcdcd;\n" \
                 "border: 2px solid #000;\n" \
                 "border-radius: 10px;\n" \
-                "padding-left: 5px;\n" \
+                "padding-left: 8px;\n" \
                 "}\n" \
                 "#dropList::drop-down {\n" \
                 "border: 0px;\n" \
                 "}\n" \
                 "#dropList::down-arrow {\n" \
-                "image: url(assets/img/arrow_down.png);\n" \
+                "image: url(assets/img/arrow_down_2.png);\n" \
                 "width: 12px;\n" \
                 "height: 12px;\n" \
                 "margin-right: 8px;\n" \
@@ -285,6 +285,12 @@ drop_list_css = "#dropList{\n" \
 
 clear_search_css = "background-color: transparent;\n" \
                    "border-image: url(assets/img/search_clear.png);\n" \
+                   "background: none;\n" \
+                   "border: none;\n" \
+                   "background-repeat: none;"
+
+clear_search_focus_css = "background-color: transparent;\n" \
+                   "border-image: url(assets/img/search_clear_focus.png);\n" \
                    "background: none;\n" \
                    "border: none;\n" \
                    "background-repeat: none;"

@@ -3,13 +3,12 @@ import os
 import shutil
 import sys
 
-from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir, QLine
+from PyQt5.QtCore import QUrl, QTimer, Qt, QPoint, QDir
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QDesktopServices
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QAction, qApp, QMenu, QFileDialog, \
     QStyle, QLineEdit
 from PyQt5.QtWinExtras import QWinThumbnailToolBar, QWinThumbnailToolButton
-from PyQt5.uic.properties import QtGui
 from mutagen.id3 import ID3
 
 import playlist
@@ -50,6 +49,8 @@ class PlayerWindow(QMainWindow):
         self.volume = 50
         self.titles = []
         self.artists = []
+        self.list_of_songs = []
+        self.search_result = []
         self.covers = []
         self.shuffle = False
         self.repeat_this = False
@@ -205,8 +206,30 @@ class PlayerWindow(QMainWindow):
         self.change_playlist()
 
         # Search
-        self.ui.clear_search.clicked.connect(self.ui.searchBar.clear)
+        self.ui.clear_search.clicked.connect(self.clear_search)
         self.search_text = None
+        self.ui.searchBar.textChanged.connect(self.search_bar)
+
+    def clear_search(self):
+        self.ui.searchBar.clear()
+        self.search_result.clear()
+        self.read_songs_from_json()
+
+    def search_bar(self):
+        self.isPlaying = False
+        input_text = self.ui.searchBar.text()
+        self.search_result.clear()
+        if input_text:
+            input_text = input_text.lower()
+            for i in range(len(self.list_of_songs)):
+                if input_text in self.list_of_songs[i].lower():
+                    self.search_result.append(i)
+            if not self.search_result:
+                self.search_result.append("-1")
+        print("???????????????????????")
+        print(self.search_result)
+        print("???????????????????????")
+        self.read_songs_from_json()
 
     def check_search_bar(self):
         if not self.ui.searchBar.text():
@@ -341,18 +364,38 @@ class PlayerWindow(QMainWindow):
             self.artists.clear()
             self.covers.clear()
             self.songs_id_from_playlist.clear()
+            self.list_of_songs.clear()
             if self.currentPlaylist == self.mainPlaylistName:
                 for i in data["Songs"]:
                     # title
                     self.titles.append(i["title"])
                     # artist
                     self.artists.append(i["artist"])
+                    # full name
+                    self.list_of_songs.append(i["title"] + " " + i["artist"])
                     # cover
                     if i["cover"] == "Undefined":
                         self.covers.append("no_image.jpg")
                     else:
                         self.covers.append(i["cover"])
                     self.songs_id_from_playlist.append(i["id"])
+                '''else:
+                    for i in data["Songs"]:
+                        for result in self.search_result:
+                            if i["id"] == result:
+                                # title
+                                self.titles.append(i["title"])
+                                # artist
+                                self.artists.append(i["artist"])
+                                # full name
+                                self.list_of_songs.append(i["title"] + " " + i["artist"])
+                                # cover
+                                if i["cover"] == "Undefined":
+                                    self.covers.append("no_image.jpg")
+                                else:
+                                    self.covers.append(i["cover"])
+                                self.songs_id_from_playlist.append(i["id"])
+                                break'''
             else:
                 for i in data["Songs"]:
                     if i["playlist"] == self.currentPlaylist:
@@ -360,12 +403,30 @@ class PlayerWindow(QMainWindow):
                         self.titles.append(i["title"])
                         # artist
                         self.artists.append(i["artist"])
+                        # full name
+                        self.list_of_songs.append(i["title"] + " " + i["artist"])
                         # cover
                         if i["cover"] == "Undefined":
                             self.covers.append("no_image.jpg")
                         else:
                             self.covers.append(i["cover"])
                         self.songs_id_from_playlist.append(i["id"])
+                '''else:
+                    for i in data["Songs"]:
+                        for result in self.search_result:
+                            if i == result:
+                                if i["playlist"] == self.currentPlaylist:
+                                    # title
+                                    self.titles.append(i["title"])
+                                    # artist
+                                    self.artists.append(i["artist"])
+                                    # cover
+                                    if i["cover"] == "Undefined":
+                                        self.covers.append("no_image.jpg")
+                                    else:
+                                        self.covers.append(i["cover"])
+                                    self.songs_id_from_playlist.append(i["id"])
+                                break'''
         except Exception as e:
             print(e)
         self.read_files_songs()
@@ -377,20 +438,57 @@ class PlayerWindow(QMainWindow):
             self.playlist = QMediaPlaylist(self.player)
 
             if self.currentPlaylist == self.mainPlaylistName:
-                count = len(os.listdir("songs"))
-                for nr in range(count):
-                    song_name = str(nr) + ".mp3"
-                    self.playlist.addMedia(
-                        QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                    self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+                if not self.search_result:
+                    count = len(os.listdir("songs"))
+                    for nr in range(count):
+                        song_name = str(nr) + ".mp3"
+                        self.playlist.addMedia(
+                            QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                        self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+                else:
+                    count = len(os.listdir("songs"))
+                    search_titles, search_artists, i = [], [], 0
+                    for nr in range(count):
+                        for result in self.search_result:
+                            if nr == result:
+                                song_name = str(nr) + ".mp3"
+                                self.playlist.addMedia(
+                                    QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                                search_titles.append(self.titles[nr])
+                                search_artists.append(self.artists[nr])
+                                self.ui.listWidget.addItem(
+                                    str(i + 1) + ". " + search_titles[i] + " - " + search_artists[i])
+                                i += 1
+                                break
+                    self.titles, self.artists = search_titles, search_artists
             else:
-                i = 0
-                for nr in self.songs_id_from_playlist:
-                    song_name = str(nr) + ".mp3"
-                    self.playlist.addMedia(
-                        QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                    self.ui.listWidget.addItem(str(i + 1) + ". " + self.titles[i] + " - " + self.artists[i])
-                    i += 1
+                if not self.search_result:
+                    i = 0
+                    for nr in self.songs_id_from_playlist:
+                        song_name = str(nr) + ".mp3"
+                        self.playlist.addMedia(
+                            QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                        self.ui.listWidget.addItem(str(i + 1) + ". " + self.titles[i] + " - " + self.artists[i])
+                        i += 1
+                else:
+                    i = 0
+                    search_titles, search_artists, j = [], [], 0
+                    print("################")
+                    for nr in self.songs_id_from_playlist:
+                        for result in self.search_result:
+                            if nr == result:
+                                print(nr)
+                                song_name = str(nr) + ".mp3"
+                                self.playlist.addMedia(
+                                    QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
+                                search_titles.append(self.titles[i])
+                                search_artists.append(self.artists[i])
+                                self.ui.listWidget.addItem(str(j + 1) + ". " + search_titles[j] + " - " + search_artists[j])
+                                j += 1
+                                break
+                        i += 1
+                    self.titles, self.artists = search_titles, search_artists
+                    print("################")
         except Exception as e:
             print(e)
 
@@ -1003,7 +1101,10 @@ class PlayerWindow(QMainWindow):
 
     def check_style_buttons(self):
         if self.isEnabled():
-            self.ui.clear_search.setStyleSheet(clear_search_css)
+            if self.ui.clear_search.underMouse():
+                self.ui.clear_search.setStyleSheet(clear_search_focus_css)
+            else:
+                self.ui.clear_search.setStyleSheet(clear_search_css)
             if self.ui.dropListGear.underMouse():
                 self.ui.dropListGear.setStyleSheet(gear_focus_css)
             else:

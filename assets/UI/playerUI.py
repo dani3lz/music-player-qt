@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import Qt
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QStyledItemDelegate
 
 
@@ -441,6 +442,7 @@ class Ui_MainWindow(object):
             "background: #181818; color: #cdcdcd; border: 2px solid #181818; border-radius: 10px; padding-left: 3px; padding-right: 22px;")
         self.searchBar.setObjectName("searchBar")
         self.searchBar.setPlaceholderText("Search")
+        self.searchBar.setCursor(QCursor(QtCore.Qt.ArrowCursor))
 
         self.clear_search = QtWidgets.QPushButton(self.groupBox)
         self.clear_search.setGeometry(QtCore.QRect(216, 167, 12, 12))
