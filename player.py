@@ -49,7 +49,7 @@ class PlayerWindow(QMainWindow):
         self.volume = 50
         self.titles = []
         self.artists = []
-        self.list_of_songs = []
+        self.list_of_songs = {}
         self.search_result = []
         self.covers = []
         self.shuffle = False
@@ -62,7 +62,6 @@ class PlayerWindow(QMainWindow):
 
         # Read file with songs and settings
         self.row = 0
-        self.songs_id_from_playlist = []
         self.mainPlaylistName = "ALL"
         self.currentPlaylist = self.mainPlaylistName
         self.read_songs_from_json()
@@ -221,14 +220,11 @@ class PlayerWindow(QMainWindow):
         self.search_result.clear()
         if input_text:
             input_text = input_text.lower()
-            for i in range(len(self.list_of_songs)):
+            for i in self.list_of_songs.keys():
                 if input_text in self.list_of_songs[i].lower():
                     self.search_result.append(i)
             if not self.search_result:
                 self.search_result.append("-1")
-        print("???????????????????????")
-        print(self.search_result)
-        print("???????????????????????")
         self.read_songs_from_json()
 
     def check_search_bar(self):
@@ -326,6 +322,7 @@ class PlayerWindow(QMainWindow):
         else:
             self.ui.gearMenu.addActions([self.create_playlist_action, self.delete_playlist_action])
         self.read_songs_from_json()
+        self.search_bar()
 
     # change middle button for toolbar nav
     def check_toolbar_button(self):
@@ -363,7 +360,6 @@ class PlayerWindow(QMainWindow):
             self.titles.clear()
             self.artists.clear()
             self.covers.clear()
-            self.songs_id_from_playlist.clear()
             self.list_of_songs.clear()
             if self.currentPlaylist == self.mainPlaylistName:
                 for i in data["Songs"]:
@@ -372,30 +368,12 @@ class PlayerWindow(QMainWindow):
                     # artist
                     self.artists.append(i["artist"])
                     # full name
-                    self.list_of_songs.append(i["title"] + " " + i["artist"])
+                    self.list_of_songs.update({i["id"]: i["title"] + " " + i["artist"]})
                     # cover
                     if i["cover"] == "Undefined":
                         self.covers.append("no_image.jpg")
                     else:
                         self.covers.append(i["cover"])
-                    self.songs_id_from_playlist.append(i["id"])
-                '''else:
-                    for i in data["Songs"]:
-                        for result in self.search_result:
-                            if i["id"] == result:
-                                # title
-                                self.titles.append(i["title"])
-                                # artist
-                                self.artists.append(i["artist"])
-                                # full name
-                                self.list_of_songs.append(i["title"] + " " + i["artist"])
-                                # cover
-                                if i["cover"] == "Undefined":
-                                    self.covers.append("no_image.jpg")
-                                else:
-                                    self.covers.append(i["cover"])
-                                self.songs_id_from_playlist.append(i["id"])
-                                break'''
             else:
                 for i in data["Songs"]:
                     if i["playlist"] == self.currentPlaylist:
@@ -404,29 +382,12 @@ class PlayerWindow(QMainWindow):
                         # artist
                         self.artists.append(i["artist"])
                         # full name
-                        self.list_of_songs.append(i["title"] + " " + i["artist"])
+                        self.list_of_songs.update({i["id"]: i["title"] + " " + i["artist"]})
                         # cover
                         if i["cover"] == "Undefined":
                             self.covers.append("no_image.jpg")
                         else:
                             self.covers.append(i["cover"])
-                        self.songs_id_from_playlist.append(i["id"])
-                '''else:
-                    for i in data["Songs"]:
-                        for result in self.search_result:
-                            if i == result:
-                                if i["playlist"] == self.currentPlaylist:
-                                    # title
-                                    self.titles.append(i["title"])
-                                    # artist
-                                    self.artists.append(i["artist"])
-                                    # cover
-                                    if i["cover"] == "Undefined":
-                                        self.covers.append("no_image.jpg")
-                                    else:
-                                        self.covers.append(i["cover"])
-                                    self.songs_id_from_playlist.append(i["id"])
-                                break'''
         except Exception as e:
             print(e)
         self.read_files_songs()
@@ -464,7 +425,7 @@ class PlayerWindow(QMainWindow):
             else:
                 if not self.search_result:
                     i = 0
-                    for nr in self.songs_id_from_playlist:
+                    for nr in self.list_of_songs.keys():
                         song_name = str(nr) + ".mp3"
                         self.playlist.addMedia(
                             QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
@@ -473,11 +434,9 @@ class PlayerWindow(QMainWindow):
                 else:
                     i = 0
                     search_titles, search_artists, j = [], [], 0
-                    print("################")
-                    for nr in self.songs_id_from_playlist:
+                    for nr in self.list_of_songs.keys():
                         for result in self.search_result:
                             if nr == result:
-                                print(nr)
                                 song_name = str(nr) + ".mp3"
                                 self.playlist.addMedia(
                                     QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
@@ -488,7 +447,6 @@ class PlayerWindow(QMainWindow):
                                 break
                         i += 1
                     self.titles, self.artists = search_titles, search_artists
-                    print("################")
         except Exception as e:
             print(e)
 
