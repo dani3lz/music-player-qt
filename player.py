@@ -206,34 +206,30 @@ class PlayerWindow(QMainWindow):
 
         # Search
         self.ui.clear_search.clicked.connect(self.clear_search)
-        self.search_text = None
         self.ui.searchBar.textChanged.connect(self.search_bar)
 
+    # clear search label
     def clear_search(self):
         self.ui.searchBar.clear()
         self.search_result.clear()
         self.read_songs_from_json()
 
+    # search song by input text
     def search_bar(self):
         self.isPlaying = False
         input_text = self.ui.searchBar.text()
         self.search_result.clear()
         if input_text:
+            self.ui.clear_search.show()
             input_text = input_text.lower()
             for i in self.list_of_songs.keys():
                 if input_text in self.list_of_songs[i].lower():
                     self.search_result.append(i)
             if not self.search_result:
                 self.search_result.append("-1")
-        self.read_songs_from_json()
-
-    def check_search_bar(self):
-        if not self.ui.searchBar.text():
-            self.ui.clear_search.hide()
-            self.search_text = None
         else:
-            self.ui.clear_search.show()
-            self.search_text = self.ui.searchBar.text()
+            self.ui.clear_search.hide()
+        self.read_songs_from_json()
 
     # delete current playlist
     def delete_playlist(self):
@@ -403,7 +399,8 @@ class PlayerWindow(QMainWindow):
                         song_name = str(song_id) + ".mp3"
                         self.playlist.addMedia(
                             QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                        self.ui.listWidget.addItem(str(song_id + 1) + ". " + self.titles[song_id] + " - " + self.artists[song_id])
+                        self.ui.listWidget.addItem(
+                            str(song_id + 1) + ". " + self.titles[song_id] + " - " + self.artists[song_id])
                 else:
                     search_titles, search_artists = [], []
                     for song_id in self.list_of_songs.keys():
@@ -427,7 +424,7 @@ class PlayerWindow(QMainWindow):
                             QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                         self.ui.listWidget.addItem(str(i + 1) + ". " + self.titles[i] + " - " + self.artists[i])
                 else:
-                    search_titles, search_artists= [], []
+                    search_titles, search_artists = [], []
                     for i, song_id in enumerate(self.list_of_songs.keys()):
                         for j, result in enumerate(self.search_result):
                             if song_id == result:
@@ -436,7 +433,8 @@ class PlayerWindow(QMainWindow):
                                     QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                                 search_titles.append(self.titles[i])
                                 search_artists.append(self.artists[i])
-                                self.ui.listWidget.addItem(str(j + 1) + ". " + search_titles[j] + " - " + search_artists[j])
+                                self.ui.listWidget.addItem(
+                                    str(j + 1) + ". " + search_titles[j] + " - " + search_artists[j])
                                 break
                     self.titles, self.artists = search_titles, search_artists
         except Exception as e:
@@ -915,7 +913,6 @@ class PlayerWindow(QMainWindow):
         self.check_style_buttons()
         self.check_style_volume()
         self.check_toolbar_button()
-        self.check_search_bar()
         if self.isPlaying:
             self.ui.musicSlider.setMaximum(self.player.duration())
             if not self.ui.musicSlider.isSliderDown():
