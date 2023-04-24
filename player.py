@@ -397,55 +397,47 @@ class PlayerWindow(QMainWindow):
         try:
             self.ui.listWidget.clear()
             self.playlist = QMediaPlaylist(self.player)
-
             if self.currentPlaylist == self.mainPlaylistName:
                 if not self.search_result:
-                    count = len(os.listdir("songs"))
-                    for nr in range(count):
-                        song_name = str(nr) + ".mp3"
+                    for song_id in self.list_of_songs.keys():
+                        song_name = str(song_id) + ".mp3"
                         self.playlist.addMedia(
                             QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                        self.ui.listWidget.addItem(str(nr + 1) + ". " + self.titles[nr] + " - " + self.artists[nr])
+                        self.ui.listWidget.addItem(str(song_id + 1) + ". " + self.titles[song_id] + " - " + self.artists[song_id])
                 else:
-                    count = len(os.listdir("songs"))
-                    search_titles, search_artists, i = [], [], 0
-                    for nr in range(count):
-                        for result in self.search_result:
-                            if nr == result:
-                                song_name = str(nr) + ".mp3"
+                    search_titles, search_artists = [], []
+                    for song_id in self.list_of_songs.keys():
+                        for i, result in enumerate(self.search_result):
+                            if song_id == result:
+                                song_name = str(song_id) + ".mp3"
                                 self.playlist.addMedia(
                                     QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
-                                search_titles.append(self.titles[nr])
-                                search_artists.append(self.artists[nr])
+                                print("before")
+                                search_titles.append(self.titles[song_id])
+                                search_artists.append(self.artists[song_id])
                                 self.ui.listWidget.addItem(
                                     str(i + 1) + ". " + search_titles[i] + " - " + search_artists[i])
-                                i += 1
                                 break
                     self.titles, self.artists = search_titles, search_artists
             else:
                 if not self.search_result:
-                    i = 0
-                    for nr in self.list_of_songs.keys():
-                        song_name = str(nr) + ".mp3"
+                    for i, song_id in enumerate(self.list_of_songs.keys()):
+                        song_name = str(song_id) + ".mp3"
                         self.playlist.addMedia(
                             QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                         self.ui.listWidget.addItem(str(i + 1) + ". " + self.titles[i] + " - " + self.artists[i])
-                        i += 1
                 else:
-                    i = 0
-                    search_titles, search_artists, j = [], [], 0
-                    for nr in self.list_of_songs.keys():
-                        for result in self.search_result:
-                            if nr == result:
-                                song_name = str(nr) + ".mp3"
+                    search_titles, search_artists= [], []
+                    for i, song_id in enumerate(self.list_of_songs.keys()):
+                        for j, result in enumerate(self.search_result):
+                            if song_id == result:
+                                song_name = str(song_id) + ".mp3"
                                 self.playlist.addMedia(
                                     QMediaContent(QUrl.fromLocalFile(QDir.currentPath() + "/songs/" + song_name)))
                                 search_titles.append(self.titles[i])
                                 search_artists.append(self.artists[i])
                                 self.ui.listWidget.addItem(str(j + 1) + ". " + search_titles[j] + " - " + search_artists[j])
-                                j += 1
                                 break
-                        i += 1
                     self.titles, self.artists = search_titles, search_artists
         except Exception as e:
             print(e)
