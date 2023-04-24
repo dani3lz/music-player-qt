@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import shutil
 import sys
 
@@ -63,13 +64,19 @@ class PlayerWindow(QMainWindow):
         self.list_of_songs = {}
         self.search_result = []
         self.covers = []
+        self.unplayed_songs = []
+        self.played_songs = []
         self.shuffle = False
         self.repeat_this = False
         self.repeatonce = False
         self.changeMode = False
+        self.isPlaying = False
         self.mode = "Normal"
         self.now_sec = 0
+        self.now_sec = 0
         self.currentIndex = 0
+        self.player = QMediaPlayer()
+        self.playlist = QMediaPlaylist(self.player)
 
         # Read file with songs and settings
         self.row = 0
@@ -80,7 +87,6 @@ class PlayerWindow(QMainWindow):
         self.check_cover()
 
         # Setup elements Nr.2
-        self.isPlaying = False
         self.ui.musicSlider.setPageStep(0)
         self.valueSlider = 0
         self.newIndex = -1
@@ -219,6 +225,9 @@ class PlayerWindow(QMainWindow):
         self.ui.clear_search.clicked.connect(self.clear_search)
         self.ui.searchBar.textChanged.connect(self.search_bar)
 
+        # Custom shuffle
+        self.reset_unplayed_songs()
+
     # clear search label
     def clear_search(self):
         self.ui.searchBar.clear()
@@ -354,11 +363,10 @@ class PlayerWindow(QMainWindow):
     # read songs from songs.json
     def read_songs_from_json(self):
         check_paths()
-        self.player = QMediaPlayer()
-        self.playlist = QMediaPlaylist(self.player)
         try:
             with open("songs.json", "r", encoding="utf-8") as file:
                 data = json.load(file)
+            self.ui.listWidget.clear()
             self.titles.clear()
             self.artists.clear()
             self.covers.clear()
@@ -392,13 +400,13 @@ class PlayerWindow(QMainWindow):
                             self.covers.append(i["cover"])
         except Exception as e:
             print(e)
+        self.reset_unplayed_songs()
         self.read_files_songs()
 
     # read songs from dir
     def read_files_songs(self):
         try:
-            self.ui.listWidget.clear()
-            self.playlist = QMediaPlaylist(self.player)
+            self.playlist.clear()
             if self.currentPlaylist == self.mainPlaylistName:
                 if not self.search_result:
                     for song_id in self.list_of_songs.keys():
@@ -843,6 +851,7 @@ class PlayerWindow(QMainWindow):
 
     # Change music using the list
     def change_song(self):
+        self.reset_unplayed_songs()
         self.row = self.ui.listWidget.currentRow()
         self.player.playlist().setCurrentIndex(self.row)
         if not self.isPlaying:
@@ -981,7 +990,10 @@ class PlayerWindow(QMainWindow):
     # Next button
     def next(self):
         if len(self.titles) > 0:
-            self.playlist.next()
+            if self.playlist.playbackMode() == QMediaPlaylist.PlaybackMode.Random:
+                self.custom_shuffle_mode("next")
+            else:
+                self.playlist.next()
             self.newIndex = self.player.playlist().currentIndex()
             if not self.isPlaying:
                 self.player.play()
@@ -992,7 +1004,10 @@ class PlayerWindow(QMainWindow):
     def prev(self):
         if len(self.titles) > 0:
             if int(self.now_sec) < 5:
-                self.playlist.previous()
+                if self.playlist.playbackMode() == QMediaPlaylist.PlaybackMode.Random:
+                    self.custom_shuffle_mode("prev")
+                else:
+                    self.playlist.previous()
                 self.newIndex = self.player.playlist().currentIndex()
             else:
                 self.player.setPosition(0)
@@ -1119,6 +1134,31 @@ class PlayerWindow(QMainWindow):
                     self.ui.volumeButton.setStyleSheet(volume_medium_css)
                 elif self.ui.volumeSlider.value() > 70:
                     self.ui.volumeButton.setStyleSheet(volume_max_css)
+
+    def custom_shuffle_mode(self, nav):
+        if nav == "next":
+            self.played_songs.append(self.playlist.currentIndex())
+            next_index = self.unplayed_songs.pop()
+            self.playlist.setCurrentIndex(next_index)
+            self.ui.listWidget.setCurrentRow(next_index)
+            if len(self.unplayed_songs) == 0:
+                self.reset_unplayed_songs()
+        elif nav == "prev":
+            if len(self.played_songs) > 0:
+                self.unplayed_songs.append(self.playlist.currentIndex())
+                prev_index = self.played_songs.pop()
+                self.playlist.setCurrentIndex(prev_index)
+                self.ui.listWidget.setCurrentRow(prev_index)
+
+    def reset_unplayed_songs(self):
+        self.unplayed_songs.clear()
+        self.played_songs.clear()
+        for nr in range(len(self.list_of_songs)):
+            self.unplayed_songs.append(nr)
+        random.shuffle(self.unplayed_songs)
+        if self.ui.listWidget.currentRow() > -1:
+            start_index = self.ui.listWidget.currentRow()
+            self.unplayed_songs.remove(start_index)
 
 
 if __name__ == "__main__":
