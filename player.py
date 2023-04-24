@@ -84,6 +84,7 @@ class PlayerWindow(QMainWindow):
         self.currentPlaylist = self.mainPlaylistName
         self.read_songs_from_json()
         self.settings_read()
+        lastRow = self.row
         self.check_cover()
 
         # Setup elements Nr.2
@@ -221,12 +222,19 @@ class PlayerWindow(QMainWindow):
         self.check_playlists()
         self.change_playlist()
 
+        # Set the last row from settings
+        self.newIndex = lastRow
+        self.check_list()
+        self.ui.listWidget.setCurrentRow(lastRow)
+        self.playlist.setCurrentIndex(lastRow)
+
         # Search
         self.ui.clear_search.clicked.connect(self.clear_search)
         self.ui.searchBar.textChanged.connect(self.search_bar)
 
         # Custom shuffle
         self.reset_unplayed_songs()
+
 
     # clear search label
     def clear_search(self):
@@ -953,9 +961,7 @@ class PlayerWindow(QMainWindow):
     # Sets the current position in the list
     def check_list(self):
         try:
-            if self.currentIndex == self.newIndex:
-                pass
-            else:
+            if not self.currentIndex == self.newIndex:
                 self.ui.listWidget.item(self.currentIndex).setText(self.text_item)
                 self.ui.listWidget.item(self.currentIndex).setForeground(QColor("#fff"))
 
