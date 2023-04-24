@@ -32,6 +32,17 @@ def open_github():
         print(e)
 
 
+def check_paths():
+    if not os.path.exists('covers'):
+        os.makedirs('covers')
+    if not os.path.exists('songs'):
+        os.makedirs('songs')
+    if not os.path.exists("songs.json"):
+        songs_list = {"Songs": []}
+        with open("songs.json", "w", encoding="utf-8") as file:
+            json.dump(songs_list, file, indent=4)
+
+
 class PlayerWindow(QMainWindow):
     def __init__(self):
         super(PlayerWindow, self).__init__()
@@ -342,12 +353,7 @@ class PlayerWindow(QMainWindow):
 
     # read songs from songs.json
     def read_songs_from_json(self):
-        if not os.path.exists('songs'):
-            os.makedirs('songs')
-        if not os.path.exists("songs.json"):
-            songs_list = {"Songs": []}
-            with open("songs.json", "w", encoding="utf-8") as file:
-                json.dump(songs_list, file, indent=4)
+        check_paths()
         self.player = QMediaPlayer()
         self.playlist = QMediaPlaylist(self.player)
         try:
@@ -495,8 +501,7 @@ class PlayerWindow(QMainWindow):
         except:
             songs_list = {"Songs": []}
         self.app_setEnabled(False)
-        if not os.path.exists('songs'):
-            os.makedirs('songs')
+        check_paths()
         nr_of_files = len(os.listdir("songs"))
         try:
             fname = QFileDialog.getOpenFileNames(self, "Open File", "", "MP3 Files (*.mp3)")
