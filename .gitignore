@@ -5,3 +5,7 @@ settings.json
 __pycache__/
 test/
 .idea/
+build/
+dist/
+player.spec
+pyinstaller.txt
