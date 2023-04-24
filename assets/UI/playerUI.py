@@ -303,13 +303,13 @@ class Ui_MainWindow(object):
         self.volumeButton.setObjectName("volumeButton")
 
         self.imgLabel = QtWidgets.QLabel(self.groupBox)
-        self.imgLabel.setGeometry(QtCore.QRect(60, 220, 150, 150))
+        self.imgLabel.setGeometry(QtCore.QRect(60, 205, 150, 150))
         self.imgLabel.setStyleSheet("background: transparent;")
         self.imgLabel.setText("")
         self.imgLabel.setObjectName("imgLabel")
 
         self.deleteButton = QtWidgets.QPushButton(self.groupBox)
-        self.deleteButton.setGeometry(QtCore.QRect(146, 391, 28, 28))
+        self.deleteButton.setGeometry(QtCore.QRect(146, 376, 28, 28))
         self.deleteButton.setStyleSheet("background-color: transparent;\n"
                                         "border-image: url(img/delete.png);\n"
                                         "background: none;\n"
@@ -413,7 +413,7 @@ class Ui_MainWindow(object):
         self.uploadButton.setObjectName("uploadButton")
 
         self.edit_btn = QtWidgets.QPushButton(self.groupBox)
-        self.edit_btn.setGeometry(QtCore.QRect(98, 390, 28, 28))
+        self.edit_btn.setGeometry(QtCore.QRect(97, 375, 28, 28))
         self.edit_btn.setStyleSheet("background-color: transparent;\n"
                                     "border-image: url(img/edit.png);\n"
                                     "background: none;\n"
